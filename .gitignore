@@ -5,6 +5,7 @@
 /.env
 env
 .env
+abc
 
 # Logs
 logs
