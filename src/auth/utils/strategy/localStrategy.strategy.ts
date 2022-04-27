@@ -4,8 +4,8 @@ import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from 'passport-local';
 import { AuthService } from "../../auth.service";
 import { AuthCredentialsDto } from "../../dto/authCredentials.dto";
-import { UserEntity } from "../../user/user.entity";
-import { UserRepository } from "../../user/user.repository";
+import { UserEntity } from "../../entity/user.entity";
+import { UserRepository } from "../../entity/user.repository";
 
 
 //!LocalStrategy :

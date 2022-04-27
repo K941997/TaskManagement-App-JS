@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { TaskToCategoryEntity } from 'src/tasks/task-to-category/taskToCategory.entity';
-import { TaskEntity } from 'src/tasks/task/task.entity';
+import { TaskToCategoryEntity } from 'src/tasks/entity/taskToCategory.entity';
+import { TaskEntity } from 'src/tasks/entity/task.entity';
 import {
   Column,
   Entity,

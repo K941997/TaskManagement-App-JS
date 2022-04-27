@@ -19,7 +19,7 @@ import { Action } from 'src/casl/casl-action.enum';
 import { PoliciesGuard } from 'src/casl/policiesGuard.guard';
 // import JwtAuthenticationGuard from 'src/auth/jwt-authentication.guard';
 import { CategoriesService } from './categories.service';
-import { CategoryEntity } from './category.entity';
+import { CategoryEntity } from './entity/category.entity';
 import { CreateCategoryDto } from './dto/createCategory.dto';
 import { UpdateCategoryDto } from './dto/updateCategory.dto';
 

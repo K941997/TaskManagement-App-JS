@@ -3,18 +3,18 @@ import { ConflictException, HttpException, HttpStatus, Injectable, InternalServe
 // import { v4 as uuid } from 'uuid'; //tạo id ngẫu nhiên
 import { CreateTaskDto } from './dto/createTask.dto';
 import { GetTasksSearchFilterDto } from './dto/getTasksSearchFilter.dto';
-import { TaskRepository } from './task/task.repository';
+import { TaskRepository } from './entity/task.repository';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TaskEntity } from './task/task.entity';
+import { TaskEntity } from './entity/task.entity';
 import { TaskStatus } from './taskStatus.enum';
 import { UpdateTaskDto } from './dto/updateTask.dto';
 import { getRepository, Repository, UpdateResult } from 'typeorm';
-import { UserEntity } from 'src/auth/user/user.entity';
-import { CategoryEntity } from 'src/categories/category.entity';
+import { UserEntity } from 'src/auth/entity/user.entity';
+import { CategoryEntity } from 'src/categories/entity/category.entity';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from 'src/casl/casl-action.enum';
 import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
-import { TaskToCategoryEntity } from './task-to-category/taskToCategory.entity';
+import { TaskToCategoryEntity } from './entity/taskToCategory.entity';
 import { CategoriesService } from 'src/categories/categories.service';
 
 @Injectable()

@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
 import { Ability, AbilityBuilder, AbilityClass, ExtractSubjectType, InferSubjects } from "@casl/ability";
 import { Injectable } from "@nestjs/common";
-import { UserEntity } from "src/auth/user/user.entity";
-import { CategoryEntity } from "src/categories/category.entity";
-import { TaskEntity } from "src/tasks/task/task.entity";
+import { UserEntity } from "src/auth/entity/user.entity";
+import { CategoryEntity } from "src/categories/entity/category.entity";
+import { TaskEntity } from "src/tasks/entity/task.entity";
 import { Action } from "./casl-action.enum";
 
 type Subjects = InferSubjects<typeof TaskEntity | typeof CategoryEntity | typeof UserEntity> | 'all';

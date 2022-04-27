@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { UserEntity } from 'src/auth/user/user.entity';
-import { CategoryEntity } from 'src/categories/category.entity';
+import { UserEntity } from 'src/auth/entity/user.entity';
+import { CategoryEntity } from 'src/categories/entity/category.entity';
 import {
   BaseEntity,
   Column,
@@ -12,7 +12,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { TaskToCategoryEntity } from '../task-to-category/taskToCategory.entity';
+import { TaskToCategoryEntity } from './taskToCategory.entity';
 import { TaskStatus } from '../taskStatus.enum';
 
 @Entity()

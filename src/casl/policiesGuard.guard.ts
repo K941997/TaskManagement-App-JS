@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { CanActivate, ExecutionContext, Injectable, Req } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { UserEntity } from "src/auth/user/user.entity";
+import { UserEntity } from "src/auth/entity/user.entity";
 import { CHECK_POLICIES_KEY } from "./casl-ability.decorator";
 import { AppAbility, CaslAbilityFactory } from "./casl-ability.factory";
 import { PolicyHandler } from "./policyhandler.handler";

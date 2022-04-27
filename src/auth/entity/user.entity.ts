@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 
 import * as bcrypt from 'bcrypt';
-import { TaskEntity } from 'src/tasks/task/task.entity';
+import { TaskEntity } from 'src/tasks/entity/task.entity';
 import { Role } from '../role/role.enum';
 import Address from './address.entity';
 

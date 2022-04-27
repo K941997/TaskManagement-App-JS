@@ -2,11 +2,11 @@
 import { ForbiddenError } from '@casl/ability';
 import { ConflictException, HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/auth/user/user.entity';
+import { UserEntity } from 'src/auth/entity/user.entity';
 import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
 import { Action } from 'src/casl/casl-action.enum';
 import {  Repository } from 'typeorm';
-import { CategoryEntity } from './category.entity';
+import { CategoryEntity } from './entity/category.entity';
 import { CreateCategoryDto } from './dto/createCategory.dto';
 import { UpdateCategoryDto } from './dto/updateCategory.dto';
 

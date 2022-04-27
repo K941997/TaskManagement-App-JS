@@ -4,8 +4,8 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDto } from './dto/authCredentials.dto';
 // import { JwtPayload } from './utils/payload/jwtPayload.interface';
-import { UserEntity } from './user/user.entity';
-import { UserRepository } from './user/user.repository';
+import { UserEntity } from './entity/user.entity';
+import { UserRepository } from './entity/user.repository';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { from, map, Observable } from 'rxjs';
@@ -13,13 +13,13 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from 'src/casl/casl-action.enum';
-// import { encodePassword, verifyComparePassword } from './utils/bcryptPassword/bcrypt';
 
-@Injectable()
+@Injectable() //!@Injectable: injected Service to Controller
 export class AuthService {
   constructor(
-    @InjectRepository(UserRepository)
-    private userRepository: UserRepository,
+    @InjectRepository(UserRepository) //!@InjectRepository: đưa UserRepository vào Service
+    private userRepository: UserRepository, //!private: vừa khai báo vừa injected vừa khởi tạo
+
     private jwtService: JwtService,
     private readonly configService: ConfigService,
     private caslAbilityFactory: CaslAbilityFactory

@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { CategoryEntity } from "src/categories/category.entity";
+import { CategoryEntity } from "src/categories/entity/category.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { TaskEntity } from "../task/task.entity";
+import { TaskEntity } from "./task.entity";
 
 //!Custom Relation ManyToMany:
 @Entity()

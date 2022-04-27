@@ -30,13 +30,13 @@ import { AppAbility, CaslAbilityFactory } from 'src/casl/casl-ability.factory';
 import { PoliciesGuard } from 'src/casl/policiesGuard.guard';
 import { CheckPolicies } from 'src/casl/casl-ability.decorator';
 import { Action } from 'src/casl/casl-action.enum';
-import { UserEntity } from './user/user.entity';
+import { UserEntity } from './entity/user.entity';
 import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Controller('auth') //localhost:3000/api/auth
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
+    private readonly authService: AuthService, //!private: vừa khai báo vừa injected vừa khởi tạo
     private caslAbilityFactory: CaslAbilityFactory) {}
 
   //!Sign Up:

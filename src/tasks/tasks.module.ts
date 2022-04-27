@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TaskRepository } from './task/task.repository';
+import { TaskRepository } from './entity/task.repository';
 import { AuthModule } from 'src/auth/auth.module';
 import { CaslModule } from 'src/casl/casl.module';
 
