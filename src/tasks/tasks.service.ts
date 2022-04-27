@@ -35,28 +35,23 @@ export class TasksService {
  
   //!Create A Task + Relation Database (author + categories):
   async createTask(createTaskDto: CreateTaskDto, author: UserEntity): Promise<TaskEntity> {
-    // console.log(user) //{ id: 1, role: "admin", ... } phục thuộc JWTStrategy + AuthService
 
     const { title, description, categoryIds } = createTaskDto;
 
-    const taskNew = new TaskEntity();
-    taskNew.title = title;
-    taskNew.description = description;
-    taskNew.status = TaskStatus.OPEN;
-    taskNew.author = author;
+    // const taskNew = new TaskEntity();
+    // taskNew.title = title;
+    // taskNew.description = description;
+    // taskNew.status = TaskStatus.OPEN;
+    // taskNew.author = author;
+    // taskNew.taskToCategory = [] ; //!ManyToMany Advanced Relation Xem lai
 
-    // taskNew.categories = [] ; //!ManyToMany Relation Xem lai
-    // for (let i = 0; i < categoryIds.length; i++) {
-    //   const category = await getRepository(CategoryEntity).findOne(categoryIds[i]);
+    const taskNew = this.taskRepository.create(
+      createTaskDto
+    )
 
-    //   if (category) {
-    //     taskNew.categories.push(category);
-    //   } else {
-    //     throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
-    //   }
-    // }
+    taskNew.author = author
+    taskNew.taskToCategory = [];
 
-    taskNew.taskToCategory = [] ; //!ManyToMany Advanced Relation Xem lai
     const newTask = await taskNew.save();
     console.log(newTask);
     
@@ -68,6 +63,7 @@ export class TasksService {
         const newTaskToCategory = new TaskToCategoryEntity();
         newTaskToCategory.taskId = newTask.id
         newTaskToCategory.categoryId = category.id
+        console.log(newTaskToCategory)
 
         taskNew.taskToCategory.push(newTaskToCategory);
       } else {
