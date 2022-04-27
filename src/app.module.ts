@@ -6,7 +6,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config'; //!use .env
+import { ConfigModule } from '@nestjs/config'; //!.env
 
 import { CategoriesModule } from './categories/categories.module';
 import { PassportModule } from '@nestjs/passport'; //PassportJS for SignUp SignIn
@@ -20,7 +20,7 @@ import { MongooseModule } from '@nestjs/mongoose'; //MongoDB
       isGlobal: true,
     }),
     
-    TypeOrmModule.forRoot(),
+    TypeOrmModule.forRoot(), //!TypeOrm PostgreSQL Database
 
     AuthModule,
     TasksModule,
@@ -30,9 +30,9 @@ import { MongooseModule } from '@nestjs/mongoose'; //MongoDB
       session: true,
     }),
 
-    CaslModule,
+    CaslModule, //!CASL Role isCreator
 
-    // MongooseModule.forRoot(process.env.CONNECT_MONGODB)
+    MongooseModule.forRoot(process.env.CONNECT_MONGODB) //!MongoDB Database
 
   ],
   controllers: [AppController],

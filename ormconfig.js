@@ -1,5 +1,7 @@
 /* eslint-disable prettier/prettier */
 // Only .js work, but env not working on docker
+
+//!TypeOrm PostgreSQL Database Config:
 let dbConfig = {
     type: 'postgres',
     host: process.env.DB_HOST,
@@ -7,6 +9,7 @@ let dbConfig = {
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    
     migrationsRun: false,
     synchronize: false,
     logging: false,

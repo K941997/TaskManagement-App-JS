@@ -34,7 +34,6 @@ export class TaskEntity extends BaseEntity {
 
   @Column({nullable: true}) //!CASL Role + isCreator thay cho role
   isPublished: boolean;
-
   @Column() //!CASL Role + isCreator thay cho role
   authorId: number;
 

@@ -39,6 +39,9 @@ export class UserEntity extends BaseEntity {
   @Column()
   password: string;
 
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
   @OneToMany(() => TaskEntity, (task: TaskEntity) => task.author, { eager: false, cascade: true })
   //eager: false (Không load tasks)
   tasks: TaskEntity[];
