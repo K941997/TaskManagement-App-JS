@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDto } from './dto/authCredentials.dto';
 // import { JwtPayload } from './utils/payload/jwtPayload.interface';
 import { UserEntity } from './entity/user.entity';
-import { UserRepository } from './entity/user.repository';
+import { UserRepository } from './user.repository';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { from, map, Observable } from 'rxjs';

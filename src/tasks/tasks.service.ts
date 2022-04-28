@@ -3,7 +3,7 @@ import { ConflictException, HttpException, HttpStatus, Injectable, InternalServe
 // import { v4 as uuid } from 'uuid'; //tạo id ngẫu nhiên
 import { CreateTaskDto } from './dto/createTask.dto';
 import { GetTasksSearchFilterDto } from './dto/getTasksSearchFilter.dto';
-import { TaskRepository } from './entity/task.repository';
+import { TaskRepository } from './task.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from './entity/task.entity';
 import { TaskStatus } from './taskStatus.enum';

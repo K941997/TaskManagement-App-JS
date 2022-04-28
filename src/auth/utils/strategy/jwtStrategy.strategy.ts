@@ -2,6 +2,8 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
+import * as dotenv from 'dotenv';
+dotenv.config()
 
 
 //!JWTStrategy:
@@ -14,8 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       //!JWTToken BearerToken:
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      // secretOrKey: process.env.SECRETKEYJWTTOKEN, //protect move to .env, secretKey in auth.module
-      secretOrKey: 'secretKey', //protect move to .env, secretKey in auth.module
+      secretOrKey: process.env.SECRET_KEY_JWT_TOKEN, //protect move to .env, secretKey in auth.module //!Thiếu dotenv.config()
       ignoreExpiration: false //Không lựa chọn bỏ qua Token hết hạn
     });
   }

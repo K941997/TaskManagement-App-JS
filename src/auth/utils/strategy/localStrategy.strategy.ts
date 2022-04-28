@@ -5,7 +5,7 @@ import { Strategy } from 'passport-local';
 import { AuthService } from "../../auth.service";
 import { AuthCredentialsDto } from "../../dto/authCredentials.dto";
 import { UserEntity } from "../../entity/user.entity";
-import { UserRepository } from "../../entity/user.repository";
+import { UserRepository } from "../../user.repository";
 
 
 //!LocalStrategy :

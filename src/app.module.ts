@@ -13,6 +13,7 @@ import { PassportModule } from '@nestjs/passport'; //PassportJS for SignUp SignI
 import { CaslModule } from './casl/casl.module'; //CASL Role isCreator
 
 import { MongooseModule } from '@nestjs/mongoose'; //MongoDB
+import { CategoriesMongoDbModule } from './categories-mongo-db/categories-mongo-db.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { MongooseModule } from '@nestjs/mongoose'; //MongoDB
 
     CaslModule, //!CASL Role isCreator
 
-    MongooseModule.forRoot(process.env.CONNECT_MONGODB) //!MongoDB Database
+    MongooseModule.forRoot(process.env.CONNECT_MONGODB), CategoriesMongoDbModule //!MongoDB Database
+    //.env CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?
 
   ],
   controllers: [AppController],

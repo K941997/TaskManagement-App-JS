@@ -12,6 +12,7 @@ import { UpdateCategoryDto } from './dto/updateCategory.dto';
 
 @Injectable()
 export class CategoriesService {
+  //todo: SQL PostgreSQL không cần có Repository riêng vì typeorm hỗ trợ:
   constructor(
     @InjectRepository(CategoryEntity)
     private categoryRepository: Repository<CategoryEntity>,
