@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Req,
@@ -55,7 +56,7 @@ export class CategoriesController {
   }
 
   //!Update Category:
-  @Put('/:id')
+  @Patch('/:id')
   @UseGuards(JwtAuthGuard, PoliciesGuard)
   @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, CategoryEntity))
   async updateCategory(

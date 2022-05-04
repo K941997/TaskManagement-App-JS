@@ -15,7 +15,8 @@ import {
   UsePipes,
   Put,
   ParseIntPipe,
-  Delete
+  Delete,
+  Patch
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/authCredentials.dto';
@@ -52,16 +53,13 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(LocalAuthGuard) //!LocalStrategy Xác thực người dùng
   @Post('/signin')
-  async signIn(@Request() req){
-
-    // console.log(req)
+  async signIn(@Request() req){ //req lấy thông tin từ LocalAuthGuard
     const user = req.user;
     user.password = undefined;
     // user.tasks = undefined; //Dùng user.entity eager: false
-
     // return {msg: ' Logged In ', user }; //Remove SessionCookie to use Guard JWTToken return access_token = BearerToken check SessionCookie:
-    const token = this.authService.loginPayloadJWTToken(user)
-    return token;
+    return this.authService.loginPayloadJWTToken(user)
+   
   }
 
   // //!Protected (Session Cookie Không cần nhập tài khoản):
@@ -73,15 +71,15 @@ export class AuthController {
   //   return req.user; //!return with jwtStrategy
   // }
 
-  // //!Get Self Info After Guard SignIn:
-  // @UseGuards(AuthGuard())
-  // @Get('/self')
-  // getSelfInfo(@Req() request: RequestWithUser) {
-  //   const user = request.user;
-  //   console.log(user);
-  //   user.password = undefined;
-  //   return user;
-  // }
+  //!Get Self Info After Guard SignIn:
+  @Get('/profile')
+  @UseGuards(JwtAuthGuard)
+  getSelfInfo(@Req() request: RequestWithUser) { //!RequestWithUser lấy thông tin từ JWTToken
+    const user = request.user;
+    console.log(user);
+    user.password = undefined;
+    return user;
+  }
 
   //!Get All Users:
   @Get()
@@ -106,7 +104,7 @@ export class AuthController {
   }
 
   //!Update User Advanced CASL Role:
-  @Put('/:id')
+  @Patch('/:id') //dùng Patch thay cho Put
   @UseGuards(JwtAuthGuard, PoliciesGuard)
   @CheckPolicies((ability: AppAbility) => ability.can(Action.Update, UserEntity))
   @UsePipes(ValidationPipe)

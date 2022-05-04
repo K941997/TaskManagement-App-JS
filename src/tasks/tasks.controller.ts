@@ -110,7 +110,7 @@ export class TasksController {
   // }
 
   //!Update Task Advanced CASL Role:
-  @Put('/:id')
+  @Patch('/:id')
   @UseGuards(JwtAuthGuard, PoliciesGuard)
   @CheckPolicies((ability: AppAbility) => ability.can(Action.Update, TaskEntity))
   @UsePipes(ValidationPipe)

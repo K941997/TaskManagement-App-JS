@@ -48,11 +48,9 @@ export class AuthService {
       throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
- 
-  //!Sign In:
 
   //!Verify Password: LocalStrategy Xác thực người dùng: 
-  //Todo: for ValidateUser:
+  //Todo: for ValidateUser: LocalStrategy
   private async verifyPassword(plainTextPassword: string, hashedPassword: string) {
     const isPasswordMatching = await bcrypt.compare(
       plainTextPassword,
@@ -78,13 +76,12 @@ export class AuthService {
     }
   }
 
-  //!LoginPayloadJWTToken: Đăng nhập tạo Token:
+  //!LoginPayloadJWTToken: JWTStrategy Đăng nhập tạo Token:
   //Todo: for AuthController Login:
-  //!Remove SessionCookie to Use Guard JWTToken return access_token = BearerToken check SessionCookie:
+  //Todo: JWTStrategy Bearer Token (for Protected after Login):
+  //Remove SessionCookie to Use Guard JWTToken return access_token = BearerToken check SessionCookie:
   async loginPayloadJWTToken (user: any) {
-    //Todo: JWTStrategy Bearer Token (for Protected after Login):
-    const payload = {sub: user.id, role: user.role, isAdmin: user.isAdmin} //!send payload to jwtStrategy
-    // console.log(payload)
+    const payload = {sub: user.id, role: user.role, isAdmin: user.isAdmin} //todo: send payload to jwtStrategy
 
     return {
       ...user,

@@ -1,27 +1,25 @@
 /* eslint-disable prettier/prettier */
 //!Schema MongoDB like Entity PostgreSQL:
-import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { MongooseModule, Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 
-export type CategoryDocument = Category & Document;
+
+
+export type CategoryDocument = CategoryMongoDB & Document;
 
 @Schema()
-export class Category {
-
-    @Prop()
-    id: string;
-
-    @Prop({ required: true })
-    name: string;
+export class CategoryMongoDB {
+    @Prop({unique: true})
+    name!: string;
 
     @Prop({ required: true })
     description: string;
-
-    @Prop({default: () => 'CURRENT_TIMESTAMP'})
-    createdAt: Date;
-
+    
     @Prop([String])
-    favorites: string[]
+    favorites: string[];
+
+    @Prop({default: Date.now})
+    createdAt: Date
 
     // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' }) //Relation
     // user: User;
@@ -37,4 +35,6 @@ export class Category {
 
 }
 
-export const CategorySchema = SchemaFactory.createForClass(Category)
+
+
+export const CategorySchema = SchemaFactory.createForClass(CategoryMongoDB);

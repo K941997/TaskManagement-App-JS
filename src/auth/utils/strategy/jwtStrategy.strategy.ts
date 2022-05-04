@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import * as dotenv from 'dotenv';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserRepository } from 'src/auth/user.repository';
 dotenv.config()
 
 
@@ -12,6 +15,8 @@ dotenv.config()
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) { 
   constructor(
+    @InjectRepository(UserRepository) //!@InjectRepository: đưa UserRepository vào Service
+    private userRepository: UserRepository, //!private: vừa khai báo vừa injected vừa khởi tạo
   ) {
     super({
       //!JWTToken BearerToken:
@@ -21,8 +26,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any){ 
-    return { id: payload.sub, role: payload.role, isAdmin: payload.isAdmin }; //!payload from jwtToken in auth.service
+  async validate(payload: any){ //todo: payload from Service
+    const user = await this.userRepository.find({id: payload.sub});
+    console.log(user)
+    return user;
+    // return { user, id: payload.sub, role: payload.role, isAdmin: payload.isAdmin };
   }
 
 }

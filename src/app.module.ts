@@ -26,6 +26,7 @@ import { CategoriesMongoDbModule } from './categories-mongo-db/categories-mongo-
     AuthModule,
     TasksModule,
     CategoriesModule,
+    CategoriesMongoDbModule,
 
     PassportModule.register({ //!Session Cookie PassportJS
       session: true,
@@ -33,9 +34,23 @@ import { CategoriesMongoDbModule } from './categories-mongo-db/categories-mongo-
 
     CaslModule, //!CASL Role isCreator
 
-    MongooseModule.forRoot(process.env.CONNECT_MONGODB), CategoriesMongoDbModule //!MongoDB Database
+    MongooseModule.forRoot(process.env.CONNECT_MONGODB, {
+      connectionName: 'categories', //connectionName ở categoriesMongo.module
+      useNewUrlParser: true, //dùng để unique: true ở Schema
+      useUnifiedTopology: true,
+      autoIndex: true,
+      
+    }), //!MongoDB Database
     //.env CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?
-
+  
+    MongooseModule.forRoot(process.env.CONNECT_MONGODB, {
+      connectionName: 'tasks', //connectionName ở tasksMongo.module
+      useNewUrlParser: true, //dùng để unique: true ở Schema
+      useUnifiedTopology: true,
+      autoIndex: true,
+      
+    }) //!MongoDB Database
+    //.env CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?
   ],
   controllers: [AppController],
   providers: [AppService],
