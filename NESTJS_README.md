@@ -29,8 +29,11 @@ $ npm run start:dev (sử dụng sẽ auto nodemon)
 - Để tạo 1 Service(Logic):
   $ nest g service messages
 
-- Để tạo 1 Repository(Database):
+- Để tạo 1 Repository(Lấy dữ liệu Database):
   Tạo file messages.repository.ts
+
+- Với SQL PostgreSQL (phải + không cần tạo Repository riêng): typeorm hỗ trợ ở Service lấy dữ liệu Database
+- Với NoSQL MongoDB (phải có Repository riêng): không có typeorm hỗ trợ ở Service để lấy dữ liệu Database
 
 # 2. Validation:
 # Để cài Validate Pipe:
@@ -669,7 +672,7 @@ $ npm install express-session @types/express-session
   })
   export class AppModule {}
 
-# RequestWithUser.interface.ts:
+# RequestWithUser.interface.ts
 
 # One to One:
 - address to user (One to One):
@@ -758,7 +761,6 @@ $ npm install express-session @types/express-session
       return taskNew;
     }
 
-
 - Category:
   + CRUD + DTO Validate + TypeOrm Entity 
 
@@ -788,6 +790,7 @@ $ npm install express-session @types/express-session
 # (Đã xong) LogOut (Frontend làm)
 # (Đã Xong) .env trong Migrations
 # (Đã Xong) học DBeaver
+# (Đã xong) CRUD with MongoDB:
 
 # (Chưa Xong) CRUD theo kiểu khác
 # (Chưa xong) CASL Super Admin, Normal Admin
@@ -796,25 +799,18 @@ $ npm install express-session @types/express-session
 # (Chưa Xong) Upload file
 # (Chưa Xong) GraphQL
 # (Chưa Xong) TypeScript
-# (Chưa xong) CRUD with MongoDB:
 # (Chưa Xong) Websocket Streaming
 # (Chưa xong) Redis, Kafka (Cache dữ liệu nhanh)
 # (Chưa Xong) Docker (Chứa C#, PHP, NodeJS, Java, ...)
 # (Chưa Xong) Microservice (Optional)
 
 ###### Authentication SignUp SignIn:
-$ npm install @types/bcrypt bcrypt
-$ npm install @nestjs/passport passport @types/passport-local passport-local @types/express
-- Dùng Bcrypt để mã hóa Password, dùng Passport để xác thực mật khẩu
-- SignUp(hashPassword) + SignIn(Get Authenticate User + VerifyPassword Compare) + LocalStrategy(PassportJS Get Authenticate User From SignIn) + LocalGuard('local' dán vào Controller SignIn)
-
 # 1. Session Cookies:
 $ npm install @nestjs/jwt passport-jwt @types/passport-jwt cookie-parser @types/cookie-parser
 $ npm install express-session
 - JWT + Session Cookie
 - JsonWebToken để người dùng xác thực mới được sử dụng dịch vụ
-- authenticatedGuard(canActivate) + auth.controller(@Get('protected') Xác thực không cần đăng nhập lại) + main.ts(session) + sessionCookieSerialize + auth.module(register Session)  + LocalGuard (add canActivate SessionCookie)
-
+- authGuard (canActivate) + auth.controller(@Get('protected') Xác thực không cần đăng nhập lại) + main.ts(session) + sessionCookieSerialize + auth.module(register Session)  + LocalGuard (add canActivate SessionCookie)
 
 # 2. JWTToken BearerToken:
 # Dùng ưu điểm hơn Session Cookies:
@@ -824,28 +820,52 @@ $ npm install express-session
 - main.ts(remove) + auth.module(remove + add JwtModule.register) + localGuard.guard(remove) + auth.service(add loginPayload) + auth.controller (SignIn return this.authService.loginPayloadJWTToken(user);) + jwtStrategy.strategy (add Bearer Token) + jwtAuthGuard ('jwt' to Controller ('/protected'))
 - Add UseGuards(JwtAuthGuard) to Task Controller
 
+$ npm install @types/bcrypt bcrypt
+$ npm install @nestjs/passport passport @types/passport-local passport-local @types/express
+- Dùng Bcrypt để mã hóa Password, dùng Passport để xác thực mật khẩu
+- SignUp (hashPassword) + Verify Password: LocalStrategy + ValidateUser: LocalStrategy + LocalStrategy + LocalGuard('local' dán vào Controller SignIn)
+- SignIn loginPayloadJWTToken + JWTStrategy + JWTGuard dán vào Controller cần JWTGuard
 
-# 3. Role User Admin (thay bằng CASL isAdmin):
-- create roleEnum
-- create roleGuard
-- create rolesDecorator
-- create Role in userEntity
-- add Role to taskController
-- add Role to authModule
-- check JWTStrategy + authService
-# (Đã xong) Chỉ hiện user.id chưa hiện user.role trong roleGuard.guard.ts (Sửa trong JWTStrategy và Service)
+# 3. Role User Admin (RBAC):
+- role.enum.ts
+- role.decorator.ts
+- role.guard.ts
+
+- create in userEntity:
+  @Column
+  role: Role 
+
+- add to taskController:
+  @Roles(Role.ADMIN, Role.PREMIUM)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+
+- add  providers: [..., RolesGuard] to authModule
+
+- check role from token in login in authService
+- (Đã xong) Chỉ hiện user.id chưa hiện user.role trong roleGuard.guard.ts (Sửa login trong Service)
 
 # 4. CASL isAdmin Role + isCreator: (thay cho Role Admin Premium - Chứa cả Super Admin + Admin)
 - $ npm i @casl/ability
--userEntity (add isAdmin: boolean;), taskEntity (add isPublished: boolean; authorId: number;)
+- userEntity: 
+  @Column
+  role: Role
+  
+  @Column
+  isAdmin: boolean;
+  
+- taskEntity:
+  @Column
+  isPublished: boolean; //xuất bản 
+
+  @Column
+  authorId: number;
 - create casl-action.enum.ts
 - $ nest g module casl
 - $ nest g class casl/casl-ability.factory
 - add casl.module:
   providers: [CaslAbilityFactory],
   exports: [CaslAbilityFactory],
-
-- task CRUD:
+- task:
   + task.module:
     imports: [CaslModule]
   + task.controller:
@@ -854,8 +874,7 @@ $ npm install express-session
     )
     thêm  (@Req() req: RequestWithUser) vào Update + Delete TaskController
   + task.service
-
-- auth user CRUD:
+- auth:
   + Tương tự task CRUD
 
 # 5. CASL Advanced: (Dùng để tạo Guard CASL gán vào TaskController, UserController CRUD cho nhanh)
@@ -868,12 +887,59 @@ $ npm install express-session
     @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, TaskEntity))
   
 
-
 ###### DBeaver hỗ trợ PostgreSQL:
 
-###### CRUD with MongoDB:
+###### MongoDB:
 $ npm install --save @nestjs/mongoose mongoose
+- .env:
+  + CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+- app.module.ts:
+  +  imports: [MongooseModule.forRoot(process.env.CONNECT_MONGODB)],
+- CRUD in categories-mongo-db:
+  + schema
+  + repository (lấy dữ liệu database) (NoSQL ko có typeorm hỗ trợ ở Service nên ko thể gọi trực tiếp Repository ở Service mà phải code ở Repository rồi gọi sang Service)
+  + service (logic)
+  + controller
+  + module (providers: [CategoriesMongoDbService, CategoryMongoRepository] thì mới chạy đc)
+
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

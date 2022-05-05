@@ -5,5 +5,5 @@ import { UserEntity } from './entity/user.entity';
 //!Repository: (Custom Repository):
 @EntityRepository(UserEntity)
 export class UserRepository extends Repository<UserEntity> {
-    //!SQL không cần lấy dữ liệu Database ở đây vì typeorm đã hỗ trợ
+    //!không cần lấy dữ liệu Database ở đây vì typeorm đã hỗ trợ Repository ở Service
 }

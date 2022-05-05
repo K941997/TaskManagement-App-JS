@@ -145,6 +145,9 @@ export class AuthService {
   //!Update User: (CASL Role isAdmin isCreator):
   async updateUser (id: number, updateUserDto: UpdateUserDto, user: UserEntity): Promise<UserEntity> {
     const caslAbility = this.caslAbilityFactory.createForUser(user)
+    if (!caslAbility) {
+      throw new UnauthorizedException()
+    }
 
     const userToUpdate = await this.findUserById(id);
 

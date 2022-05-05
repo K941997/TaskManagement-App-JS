@@ -25,11 +25,6 @@ export class TasksService {
 
     private caslAbilityFactory: CaslAbilityFactory, //CASL Role
 
-    // @InjectRepository(CategoriesService)
-    // private categoryService: CategoriesService,
-    // @InjectRepository(TaskToCategoryEntity)
-    // private taskToCategory: Repository<TaskToCategoryEntity>
-
   ) {}
 
  
@@ -119,31 +114,20 @@ export class TasksService {
 
   //!Update Task use CASL Role:
   async updateTask (id: number, updateTaskDto: UpdateTaskDto, user:UserEntity) : Promise<TaskEntity> {
+
+    //todo: CASL isAdmin isCreator:
     const caslAbility = this.caslAbilityFactory.createForUser(user)
-
-
     const taskToUpdate = await this.getTaskById(id);
       ForbiddenError.from(caslAbility)
         .setMessage('only admin or creator!')
         .throwUnlessCan(Action.Update, taskToUpdate);
 
-    // await this.taskRepository.update(id, updateTaskDto)
     const updatedTask = await this.taskRepository.findOne(id, {relations: ['author']})
 
     const { title, description, categoryIds } = updateTaskDto;
 
     updatedTask.title = title;
     updatedTask.description = description;
-    
-    // updatedTask.categories = [] ; //!ManyToMany Relation Xem lai
-    // for (let i = 0; i < categoryIds.length; i++) {
-    //   const category = await getRepository(CategoryEntity).findOne(categoryIds[i]);
-    //   if (category) {
-    //     updatedTask.categories.push(category);
-    //   } else {
-    //     throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
-    //   }
-    // }
 
     updatedTask.taskToCategory = [] ; //!ManyToMany Relation Xem lai
     for (let i = 0; i < categoryIds.length; i++) {
@@ -169,6 +153,7 @@ export class TasksService {
 
   //!Delete Task use CASL Role:
   async deleteTask(id: number, user: UserEntity): Promise<void> {
+    
     //todo: CASL isAdmin isCreator:
     const caslAbility = this.caslAbilityFactory.createForUser(user)
     const taskToDelete = await this.getTaskById(id);

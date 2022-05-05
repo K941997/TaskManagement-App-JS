@@ -42,9 +42,8 @@ export class AuthController {
 
   //!Sign Up:
   @Post('/signup')
-  @UsePipes(ValidationPipe)
+  @UsePipes(ValidationPipe) //có hoặc không vì đã có Global Validation
   signUp(@Body() authCreadentialsDto: AuthCredentialsDto) {
-    console.log(authCreadentialsDto);
     return this.authService.signUp(authCreadentialsDto);
   }
 
@@ -53,7 +52,7 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(LocalAuthGuard) //!LocalStrategy Xác thực người dùng
   @Post('/signin')
-  async signIn(@Request() req){ //req lấy thông tin từ LocalAuthGuard
+  async signIn(@Request() req){ //!req lấy thông tin từ LocalAuthGuard
     const user = req.user;
     user.password = undefined;
     // user.tasks = undefined; //Dùng user.entity eager: false
@@ -74,11 +73,11 @@ export class AuthController {
   //!Get Self Info After Guard SignIn:
   @Get('/profile')
   @UseGuards(JwtAuthGuard)
-  getSelfInfo(@Req() request: RequestWithUser) { //!RequestWithUser lấy thông tin từ JWTToken
+  getSelfInfo(@Req() request) { //!request lấy thông tin từ JWTToken
     const user = request.user;
     console.log(user);
     user.password = undefined;
-    return user;
+    return user; //không có logic ở service nên return user luôn
   }
 
   //!Get All Users:

@@ -52,12 +52,13 @@ export class TasksController {
   // @Roles(Role.ADMIN, Role.PREMIUM)
   // @UseGuards(JwtAuthGuard, RolesGuard)
   @UseGuards(JwtAuthGuard)
+  
   @UsePipes(ValidationPipe)
   async createTask(
     @Body() createTaskDto: CreateTaskDto,
     @Req() req: RequestWithUser, //!(Req after LogIn) use in createTask
   ): Promise<TaskEntity> {
-    console.log(req.user) //{ id: 1, role: "admin", ... } phục thuộc JWTStrategy + AuthService
+    console.log(req.user) //{ id: 1, role: "admin", ... } phục thuộc login trả jwttokenpayload ở AuthService
 
     return this.tasksService.createTask(createTaskDto, req.user);
 
@@ -87,28 +88,6 @@ export class TasksController {
   //   return this.tasksService.updateTaskStatus(id, status);
   // }
 
-  // //!Update Task Normal CASL Role:
-  // @Put('/:id')
-  // @UseGuards(JwtAuthGuard)
-  // @UsePipes(ValidationPipe)
-  // async updateTask(
-  //   @Param('id', ParseIntPipe) id: number,
-  //   @Body() updateTaskDto: UpdateTaskDto,
-  //   @Req() req: RequestWithUser, //!(Req after LogIn) use in CASL
-  // ): Promise<TaskEntity> {
-  //   //todo: CASL to Role + isCreator:
-  //   //todo: CASL to Service:
-  //   const user = req.user
-
-  //   try {
-  //     return this.tasksService.updateTask(id, updateTaskDto, user);
-  //   } catch (error) {
-  //     if (error instanceof ForbiddenError) {
-  //       throw new ForbiddenException(error.message);
-  //     }
-  //   }
-  // }
-
   //!Update Task Advanced CASL Role:
   @Patch('/:id')
   @UseGuards(JwtAuthGuard, PoliciesGuard)
@@ -117,7 +96,7 @@ export class TasksController {
   async updateTask(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTaskDto: UpdateTaskDto,
-    @Req() req: RequestWithUser, //!(Req after LogIn) use in CASL
+    @Req() req: RequestWithUser, //req from JwtAuthGuard
   ): Promise<TaskEntity> {
     //todo: CASL to Role + isCreator:
     //todo: CASL to Service:
@@ -125,26 +104,6 @@ export class TasksController {
 
     return this.tasksService.updateTask(id, updateTaskDto, user);
   }
-
-  // //!Delete Task Normal CASL Role isAdmin isCreator:
-  // @UseGuards(JwtAuthGuard)
-  // @Delete('/:id')
-  // async deleteTask(
-  //   @Param('id', ParseIntPipe) id: number,
-  //   @Req() req: RequestWithUser, //!(Req after LogIn) use in CASL
-  // ): Promise<void> {
-  //   //todo: CASL Normal:
-  //   //todo: CASL cho vào Service:
-  //   const user = req.user
-
-  //   try {    
-  //       return this.tasksService.deleteTask(id, user);
-  //     } catch (error) {
-  //       if (error instanceof ForbiddenError) {
-  //         throw new ForbiddenException(error.message);
-  //       }
-  //   }
-  // }
 
   //!Delete Task Advanced CASL Role isAdmin isCreator:
   @Delete('/:id')
@@ -154,11 +113,11 @@ export class TasksController {
   @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, TaskEntity))
   async deleteTask(
     @Param('id', ParseIntPipe) id: number,
-    @Req() req: RequestWithUser, //!(Req after LogIn) use in CASL
+    @Req() req: RequestWithUser, //req from JwtAuthGuard
   ): Promise<void> {
     const user = req.user
 
-    return this.tasksService.deleteTask(id,user);
+    return this.tasksService.deleteTask(id, user);
   }
 
 

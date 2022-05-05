@@ -17,7 +17,7 @@ export class CaslAbilityFactory {
       Ability<[Action, Subjects]>
     >(Ability as AbilityClass<AppAbility>);
 
-    if (user.isAdmin) {
+    if (user.role === 'admin' || user.role === 'super_admin') {
       can(Action.Manage, 'all'); // read-write access to everything
       
       // cannot(Action.Manage, UserEntity, {orgId: {$ne: user.orgId}}) //!Admin chỉ đc manage user trong tổ chức của mình
@@ -26,13 +26,17 @@ export class CaslAbilityFactory {
       can(Action.Read, 'all'); // read-only access to everything
     }
 
+    
     can(Action.Update, TaskEntity, { authorId: user.id }); // only if they own it
-    can(Action.Delete, TaskEntity, { authorId: user.id }); // only if they own it
+    can(Action.Delete, TaskEntity, { authorId: user.id}); // only if they own it
+
+    // can(Action.Update, TaskEntity, { author: {id: user.id} }); // only if they own it
+    // can(Action.Delete, TaskEntity, { author: {id: user.id} }); // only if they own it
 
     can(Action.Update, UserEntity, {id: user.id}); // only if they own it
     can(Action.Delete, UserEntity, {id: user.id}); // only if they own it
 
-    // cannot(Action.Delete, TaskEntity, { isPublished: true });
+    // cannot(Action.Delete, TaskEntity, { isPublished: true }); //không thể delete nếu đã xuất bán
 
     return build({
       // Read https://casl.js.org/v5/en/guide/subject-type-detection#use-classes-as-subject-types for details

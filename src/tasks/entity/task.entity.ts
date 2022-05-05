@@ -33,13 +33,14 @@ export class TaskEntity extends BaseEntity {
   createdAt: Date;
 
   @Column({nullable: true}) //!CASL Role + isCreator thay cho role
-  isPublished: boolean;
+  isPublished: boolean; //xuất bản
+
   @Column() //!CASL Role + isCreator thay cho role
   authorId: number;
 
   @ManyToOne(() => UserEntity, (author: UserEntity) => author.tasks, { eager: false, onDelete: "CASCADE"}) 
   //eager: false (Không load author)
-  //!onDelete: "CASCADE" Xóa User Xóa luôn Task
+  //onDelete: "CASCADE" Xóa User Xóa luôn Task
   //onDelete: "SET NULL" Đặt authorId = null nếu xóa author
   @JoinColumn( //!JoinColumn() (Chỉ được đặt 1 bên) dùng cho OneToOne, ManyToOne(Có thể bỏ qua)
     { name: "authorId", referencedColumnName: "id" }

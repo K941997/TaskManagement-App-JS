@@ -43,8 +43,8 @@ dotenv.config()
    
   ],
 
-  // providers: [AuthService, JwtStrategy, LocalStrategy, SessionCookieSerializer], //!Session Cookie
-  providers: [AuthService, JwtStrategy, LocalStrategy, JwtAuthGuard, RolesGuard], //!..., JwtAuthGuard to TaskController, JwtStrategy Remove SessionCookie to use Guard JWTToken return access_token = BearerToken check SessionCookie
+  // providers: [AuthService, JwtStrategy, LocalStrategy, SessionCookieSerializer], //!SessionCookies
+  providers: [AuthService, JwtStrategy, LocalStrategy, JwtAuthGuard, RolesGuard], //!JWT Remove SessionCookies, RolesGuard RBAC not CASL
 
   controllers: [AuthController],
 

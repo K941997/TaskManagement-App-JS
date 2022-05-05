@@ -27,7 +27,7 @@ export class RolesGuard implements CanActivate {
 
         const {user}: {user: UserEntity} = context.switchToHttp().getRequest();
 
-        // console.log(user); //{ id: 1, role: "admin", ... } phục thuộc JWTStrategy + AuthService
+        // console.log(user); //{ id: 1, role: "admin", ... } phục thuộc JWT Token từ Login AuthService
 
         console.log(requiredRoles.some((role) => user.role?.includes(role)))
 
