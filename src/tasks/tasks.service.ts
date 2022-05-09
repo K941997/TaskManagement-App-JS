@@ -45,7 +45,7 @@ export class TasksService {
     )
 
     taskNew.author = author
-    taskNew.taskToCategory = [];
+    taskNew.taskToCategories = [];
 
     const newTask = await taskNew.save();
     console.log(newTask);
@@ -60,7 +60,7 @@ export class TasksService {
         newTaskToCategory.categoryId = category.id
         console.log(newTaskToCategory)
 
-        taskNew.taskToCategory.push(newTaskToCategory);
+        taskNew.taskToCategories.push(newTaskToCategory);
       } else {
         throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
       }
@@ -76,7 +76,7 @@ export class TasksService {
     const query = this.taskRepository
       .createQueryBuilder('task') //!TypeOrm Query Builder
       .orderBy("task.id")
-      .leftJoinAndSelect('task.taskToCategory', 'category');
+      .leftJoinAndSelect('task.taskToCategories', 'category');
     if (status) {
       query.andWhere('task.status = :status', { status });
     }
@@ -94,7 +94,7 @@ export class TasksService {
 
   //!Get Task By Id:
   async getTaskById(id: number): Promise<TaskEntity> {
-    const taskFound = await this.taskRepository.findOne(id, {relations: ['author', 'taskToCategory']});
+    const taskFound = await this.taskRepository.findOne(id, {relations: ['author', 'taskToCategories']});
 
     if (!taskFound) { //Error Handle:
       throw new NotFoundException(`Task with ID ${id} not found !`);
@@ -129,7 +129,7 @@ export class TasksService {
     updatedTask.title = title;
     updatedTask.description = description;
 
-    updatedTask.taskToCategory = [] ; //!ManyToMany Relation Xem lai
+    updatedTask.taskToCategories = [] ; //!ManyToMany Relation Xem lai
     for (let i = 0; i < categoryIds.length; i++) {
       const category = await getRepository(CategoryEntity).findOne(categoryIds[i]);
       console.log(category)
@@ -139,7 +139,7 @@ export class TasksService {
         updateTaskToCategory.taskId = updatedTask.id
         updateTaskToCategory.categoryId = category.id
 
-        updatedTask.taskToCategory.push(updateTaskToCategory);
+        updatedTask.taskToCategories.push(updateTaskToCategory);
       } else {
         throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
       }
@@ -147,20 +147,10 @@ export class TasksService {
 
     await updatedTask.save();
     return updatedTask;
-
-    
   }
 
   //!Delete Task use CASL Role:
-  async deleteTask(id: number, user: UserEntity): Promise<void> {
-    
-    //todo: CASL isAdmin isCreator:
-    const caslAbility = this.caslAbilityFactory.createForUser(user)
-    const taskToDelete = await this.getTaskById(id);
-    ForbiddenError.from(caslAbility)
-      .setMessage('only admin or creator!')
-      .throwUnlessCan(Action.Delete, taskToDelete);
-
+  async deleteTask(id: number): Promise<void> {
     const result = await this.taskRepository.delete(id);
     if (result.affected === 0) { //Error Handle:
       throw new NotFoundException(`Task with ID ${id} is not found !`);

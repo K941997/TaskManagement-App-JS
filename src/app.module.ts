@@ -43,13 +43,13 @@ import { CategoriesMongoDbModule } from './categories-mongo-db/categories-mongo-
     }), //!MongoDB Database
     //.env CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?
   
-    MongooseModule.forRoot(process.env.CONNECT_MONGODB, {
-      connectionName: 'tasks', //connectionName ở tasksMongo.module
-      useNewUrlParser: true, //dùng để unique: true ở Schema
-      useUnifiedTopology: true,
-      autoIndex: true,
+    // MongooseModule.forRoot(process.env.CONNECT_MONGODB, {
+    //   connectionName: 'tasks', //connectionName ở tasksMongo.module
+    //   useNewUrlParser: true, //dùng để unique: true ở Schema
+    //   useUnifiedTopology: true,
+    //   autoIndex: true,
       
-    }) //!MongoDB Database
+    // }), UserTypesModule //!MongoDB Database
     //.env CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?
   ],
   controllers: [AppController],

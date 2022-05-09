@@ -8,12 +8,13 @@ import {
   ManyToMany,
   Unique,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
 @Unique(['name']) //Không trùng lặp name
 export class CategoryEntity {
- 
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -32,5 +33,6 @@ export class CategoryEntity {
   //!Custom ManyToMany: (Dùng)
   @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.category, {nullable: true})
   //!Không onDelete: "CASCADE" thì Xóa Relation TaskToCategory Không Xóa luôn Category
-  public taskToCategory: TaskToCategoryEntity[];
+  // @JoinColumn({ referencedColumnName: 'categoryId' })
+  public taskToCategories: TaskToCategoryEntity[];
 }

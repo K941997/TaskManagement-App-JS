@@ -17,6 +17,7 @@ import { TaskStatus } from '../taskStatus.enum';
 
 @Entity()
 export class TaskEntity extends BaseEntity {
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -52,9 +53,13 @@ export class TaskEntity extends BaseEntity {
   // @ManyToMany(() => CategoryEntity, (category: CategoryEntity) => category.tasks, {nullable: true})
   // @JoinTable() //!JoinTable() (Chỉ được đặt 1 bên) dùng cho ManyToMany
   // public categories: CategoryEntity[];
+
   //!Custom ManyToMany: (Dùng)
-  @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.task, {nullable: true, cascade: ['insert']} )
+  @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.task, {nullable: true})
   //!Không onDelete: "CASCADE" thì Xóa Relation TaskToCategory Không Xóa luôn Task
-  public taskToCategory: TaskToCategoryEntity[];
+  // @JoinColumn({ referencedColumnName: 'taskId' })
+  public taskToCategories: TaskToCategoryEntity[];
+
 }
+
 

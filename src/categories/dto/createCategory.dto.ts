@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+/* eslint-disable prettier/prettier */
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { IsNull } from 'typeorm';
 
 export class CreateCategoryDto {

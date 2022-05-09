@@ -45,13 +45,13 @@ export class CategoriesService {
 
   //!Get All Categories:
   getAllCategories(): Promise<CategoryEntity[]> {
-    return this.categoryRepository.find({ relations: ['taskToCategory'] });
+    return this.categoryRepository.find({ relations: ['taskToCategories'] });
   }
 
   //!Get Category By Id:
   async getCategoryById(id: number): Promise<CategoryEntity> {
     const category = await this.categoryRepository.findOne(id, {
-      relations: ['taskToCategory'],
+      relations: ['taskToCategories'],
     });
     if (category) {
       return category;
@@ -73,7 +73,7 @@ export class CategoriesService {
       
     await this.categoryRepository.update(id, updateCategoryDto);
     const updatedCategory = await this.categoryRepository.findOne(id, {
-      relations: ['taskToCategory'],
+      relations: ['taskToCategories'],
     });
 
     if (updatedCategory) {

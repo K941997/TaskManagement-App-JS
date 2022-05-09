@@ -107,8 +107,33 @@ export class TasksController {
 
   //!Delete Task Advanced CASL Role isAdmin isCreator:
   @Delete('/:id')
-  //todo: CASL Advanced:
-  //todo: CASL cho vào Service:
+  
+  // //!Cách 1:
+  // //todo: CASL Basic:
+  // @UseGuards(JwtAuthGuard) //!JwtAuthGuard + CASL
+  // async deleteTask(
+  //   @Param('id', ParseIntPipe) id: number,
+  //   @Req() req: RequestWithUser, //req from JwtAuthGuard
+  // ): Promise<void> {
+  //   const user = req.user
+   
+  //   //todo: CASL isAdmin isCreator:
+  //   const caslAbility = this.caslAbilityFactory.createForUser(user)
+  //   const taskToDelete = await this.getTaskById(id);
+
+  //   try {
+  //     ForbiddenError.from(caslAbility)
+  //       .throwUnlessCan(Action.Delete, taskToDelete);
+  //     return this.tasksService.deleteTask(id);
+  //   } catch (error) {
+  //     if (error instanceof ForbiddenError) {
+  //       throw new ForbiddenException(error.message);
+  //     }
+  //   }
+  // }
+
+  //!Cách 2: Chưa xong:
+  //todo: CASL Advanced: Implementing a PoliciesGuard:
   @UseGuards(JwtAuthGuard, PoliciesGuard) //!JwtAuthGuard + CASL
   @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, TaskEntity))
   async deleteTask(
@@ -117,7 +142,8 @@ export class TasksController {
   ): Promise<void> {
     const user = req.user
 
-    return this.tasksService.deleteTask(id, user);
+   
+    return this.tasksService.deleteTask(id);
   }
 
 

@@ -7,9 +7,10 @@ import { AppAbility, CaslAbilityFactory } from "./casl-ability.factory";
 import { PolicyHandler } from "./policyhandler.handler";
 
 /* eslint-disable prettier/prettier */
+//!Advanced CASL: Implementing a PoliciesGuard:
 @Injectable()
 export class PoliciesGuard implements CanActivate {
-  //!CASL Policies:
+  
   constructor(
     private reflector: Reflector,
     private caslAbilityFactory: CaslAbilityFactory,
@@ -23,8 +24,6 @@ export class PoliciesGuard implements CanActivate {
       ) || [];
 
     const { user } = context.switchToHttp().getRequest();
-    console.log(user)
-    
     const ability = this.caslAbilityFactory.createForUser(user);
 
     return policyHandlers.every((handler) =>
