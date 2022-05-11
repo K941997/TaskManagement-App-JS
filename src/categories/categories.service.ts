@@ -25,8 +25,6 @@ export class CategoriesService {
     const caslAbility = this.caslAbilityFactory.createForUser(user)
     const newCategory = await this.categoryRepository.create(category);
 
-  
-   
     try {
       ForbiddenError.from(caslAbility)
       .throwUnlessCan(Action.Create, newCategory);

@@ -32,7 +32,6 @@ export class TasksService {
   async createTask(createTaskDto: CreateTaskDto, author: UserEntity): Promise<TaskEntity> {
 
     const { title, description, categoryIds } = createTaskDto;
-
     // const taskNew = new TaskEntity();
     // taskNew.title = title;
     // taskNew.description = description;
@@ -40,34 +39,40 @@ export class TasksService {
     // taskNew.author = author;
     // taskNew.taskToCategory = [] ; //!ManyToMany Advanced Relation Xem lai
 
-    const taskNew = this.taskRepository.create(
+    const task = this.taskRepository.create(
       createTaskDto
     )
 
-    taskNew.author = author
-    taskNew.taskToCategories = [];
+    task.author = author
+    task.taskToCategories = []; //Tạo Task chứa Categories rỗng:
+    const newTask = await task.save();
+
+
+    //!Tạo 2 categories giống nhau, trả về 1 category:
+    const arr = [];
+    for(let i = 0; i<categoryIds.length; i++){
+      if(arr.indexOf(categoryIds[i]) === -1)
+        arr.push(categoryIds[i])
+    }
+    console.log(arr)
     
-    for (let i = 0; i < categoryIds.length; i++) {
-      const category = await getRepository(CategoryEntity).findOne(categoryIds[i]);
+    //Tạo Task chứa Categories có giá trị:
+    for (let i = 0; i < arr.length; i++) {
+      const category = await getRepository(CategoryEntity).findOne(arr[i]);
 
       if (category) {
-        const newTask = await taskNew.save();
-        console.log(newTask);
 
-        const newTaskToCategory = new TaskToCategoryEntity();
-        newTaskToCategory.taskId = newTask.id
-        newTaskToCategory.categoryId = category.id
+        const taskToCategory = new TaskToCategoryEntity();
+        taskToCategory.taskId = newTask.id
+        taskToCategory.categoryId = category.id
 
-        //!Cần phải save TaskToCategory
-
-        taskNew.taskToCategories.push(newTaskToCategory);
-   
-      } else {
-        throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
-      }  
+        task.taskToCategories.push(taskToCategory); 
+      }
     }
-    await taskNew.save()
-    return taskNew;
+
+    await task.save()
+    return task;
+
   }
 
   //!Get All Tasks + Get All Tasks Search Filter:
