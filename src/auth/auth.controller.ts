@@ -104,8 +104,7 @@ export class AuthController {
 
   //!Update User Advanced CASL Role:
   @Patch('/:id') //dùng Patch thay cho Put
-  @UseGuards(JwtAuthGuard, PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can(Action.Update, UserEntity))
+  @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async updateTask(
     @Param('id', ParseIntPipe) id: number,
@@ -122,10 +121,8 @@ export class AuthController {
   //!Delete User Advanced CASL Role isAdmin isCreator:
   //!(Đã xong) nếu xóa 1 User phải xóa cả các relation:
   @Delete('/:id')
-  //todo: CASL Advanced:
   //todo: CASL cho vào Service:
-  @UseGuards(JwtAuthGuard, PoliciesGuard) //!JwtAuthGuard + CASL
-  @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, UserEntity))
+  @UseGuards(JwtAuthGuard) //!JwtAuthGuard
   async deleteUser(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: RequestWithUser, //!(Req after LogIn) use in CASL

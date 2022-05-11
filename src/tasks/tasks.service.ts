@@ -46,26 +46,26 @@ export class TasksService {
 
     taskNew.author = author
     taskNew.taskToCategories = [];
-
-    const newTask = await taskNew.save();
-    console.log(newTask);
     
     for (let i = 0; i < categoryIds.length; i++) {
       const category = await getRepository(CategoryEntity).findOne(categoryIds[i]);
-      console.log(category)
 
       if (category) {
+        const newTask = await taskNew.save();
+        console.log(newTask);
+
         const newTaskToCategory = new TaskToCategoryEntity();
         newTaskToCategory.taskId = newTask.id
         newTaskToCategory.categoryId = category.id
-        console.log(newTaskToCategory)
+
+        //!Cần phải save TaskToCategory
 
         taskNew.taskToCategories.push(newTaskToCategory);
+   
       } else {
         throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
-      }
+      }  
     }
-
     await taskNew.save()
     return taskNew;
   }
@@ -77,6 +77,7 @@ export class TasksService {
       .createQueryBuilder('task') //!TypeOrm Query Builder
       .orderBy("task.id")
       .leftJoinAndSelect('task.taskToCategories', 'category');
+      
     if (status) {
       query.andWhere('task.status = :status', { status });
     }
@@ -95,7 +96,7 @@ export class TasksService {
   //!Get Task By Id:
   async getTaskById(id: number): Promise<TaskEntity> {
     const taskFound = await this.taskRepository.findOne(id, {relations: ['author', 'taskToCategories']});
-
+   
     if (!taskFound) { //Error Handle:
       throw new NotFoundException(`Task with ID ${id} not found !`);
     } else {

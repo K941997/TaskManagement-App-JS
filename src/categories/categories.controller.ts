@@ -33,8 +33,7 @@ export class CategoriesController {
 
   //!Create Category:
   @Post()
-  @UseGuards(JwtAuthGuard, PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, CategoryEntity))
+  @UseGuards(JwtAuthGuard)
   async createCategory(
     @Body() category: CreateCategoryDto,
     @Req() req: RequestWithUser, //!(Req after LogIn) use in CASL
@@ -57,8 +56,7 @@ export class CategoriesController {
 
   //!Update Category:
   @Patch('/:id')
-  @UseGuards(JwtAuthGuard, PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, CategoryEntity))
+  @UseGuards(JwtAuthGuard)
   async updateCategory(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -70,8 +68,7 @@ export class CategoriesController {
 
   //!Delete Category By Id:
   @Delete('/:id')
-  @UseGuards(JwtAuthGuard, PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, CategoryEntity))
+  @UseGuards(JwtAuthGuard)
   async deleteCategory(
     @Param('id') id: string,
     @Req() req: RequestWithUser, //!(Req after LogIn) use in CASL

@@ -48,14 +48,15 @@ export class TaskEntity extends BaseEntity {
   ) 
   author: UserEntity; 
 
-
   //!ManyToMany: (Không dùng)
   // @ManyToMany(() => CategoryEntity, (category: CategoryEntity) => category.tasks, {nullable: true})
   // @JoinTable() //!JoinTable() (Chỉ được đặt 1 bên) dùng cho ManyToMany
   // public categories: CategoryEntity[];
 
   //!Custom ManyToMany: (Dùng)
-  @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.task, {nullable: true})
+  @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.task,
+    {nullable: true,  eager: true, cascade: true})
+  //!Eager: true, Cascade: true để lưu vào database
   //!Không onDelete: "CASCADE" thì Xóa Relation TaskToCategory Không Xóa luôn Task
   // @JoinColumn({ referencedColumnName: 'taskId' })
   public taskToCategories: TaskToCategoryEntity[];

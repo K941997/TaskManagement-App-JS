@@ -773,6 +773,51 @@ $ npm install express-session @types/express-session
     public tasks: TaskEntity[];
     ...
 
+
+# Many to Many (Advanced Custom):
+- Phải có eager và cascade để lưu dữ liệu vào database
+
+- task.entity:
+  @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.task,
+    {nullable: true,  eager: true, cascade: true})
+  //!Eager: true, Cascade: true để lưu vào database
+  //!Không onDelete: "CASCADE" thì Xóa Relation TaskToCategory Không Xóa luôn Task
+  // @JoinColumn({ referencedColumnName: 'taskId' })
+  public taskToCategories: TaskToCategoryEntity[];
+
+- category.entity:
+  @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.category,
+    {nullable: true, eager: true,
+      cascade: true})
+  //!Eager: true, Cascade: true để lưu vào database
+  //!Không onDelete: "CASCADE" thì Xóa Relation TaskToCategory Không Xóa luôn Category
+  // @JoinColumn({ referencedColumnName: 'categoryId' })
+  public taskToCategories: TaskToCategoryEntity[];
+
+- taskToCategory.entity:
+  @PrimaryGeneratedColumn()
+  public taskToCategoryId: number
+
+  @Column()
+  public taskId: number
+
+  @Column()
+  public categoryId: number
+  
+  @ManyToOne(() => TaskEntity, (task) => task.taskToCategories, {onDelete: "CASCADE"})
+  //!{onDelete: "CASCADE"}: Xóa Task Xóa luôn Relation TaskToCategory
+  // @JoinColumn({name: 'taskId'})
+  public task: TaskEntity
+
+  @ManyToOne(() => CategoryEntity, (category) => category.taskToCategories, {onDelete: "CASCADE"})
+  //!{onDelete: "CASCADE"}: Xóa Category Xóa luôn Relation TaskToCategory
+  // @JoinColumn({name: 'categoryId'})
+  public category: CategoryEntity
+
+
+
+
+
 # (Đã Xong) JWTToken thay cho SessionCookies
 # (Đã Xong) Đang gặp lỗi Many To Many tạo 1 Task chứa Categories [1,2,3] 2, 3 không tồn tại -> bị Internal server error
 # (Đã Xong) Nếu nhập API phải để "categoryIds": [] thì mới được rỗng, nếu ko nhập "categoryIds" thì sẽ lỗi 
@@ -826,7 +871,8 @@ $ npm install @nestjs/passport passport @types/passport-local passport-local @ty
 - SignUp (hashPassword) + Verify Password: LocalStrategy + ValidateUser: LocalStrategy + LocalStrategy + LocalGuard('local' dán vào Controller SignIn)
 - SignIn loginPayloadJWTToken + JWTStrategy + JWTGuard dán vào Controller cần JWTGuard
 
-# 3. Role User Admin (RBAC):
+##### Authorization Role:
+# 1. Role User Admin (RBAC):
 - role.enum.ts
 - role.decorator.ts
 - role.guard.ts
@@ -844,7 +890,7 @@ $ npm install @nestjs/passport passport @types/passport-local passport-local @ty
 - check role from token in login in authService
 - (Đã xong) Chỉ hiện user.id chưa hiện user.role trong roleGuard.guard.ts (Sửa login trong Service)
 
-# 4. CASL isAdmin Role + isCreator: (thay cho Role Admin Premium - Chứa cả Super Admin + Admin)
+# 2. CASL isAdmin Role + isCreator: (thay cho Role Admin Premium - Chứa cả Super Admin + Admin)
 - $ npm i @casl/ability
 - userEntity: 
   @Column
@@ -877,7 +923,7 @@ $ npm install @nestjs/passport passport @types/passport-local passport-local @ty
 - auth:
   + Tương tự task CRUD
 
-# 5. CASL Advanced: (Dùng để tạo Guard CASL gán vào TaskController, UserController CRUD cho nhanh)
+# 3. CASL Advanced: (Dùng để tạo Guard CASL gán vào TaskController, UserController CRUD cho nhanh)
 - create IPolicyHandler.handler.ts
 - create casl-ability.decorator.ts
 - create policiesGuard.guard.ts
@@ -885,6 +931,12 @@ $ npm install @nestjs/passport passport @types/passport-local passport-local @ty
   + add
     @UseGuards(JwtAuthGuard, PoliciesGuard) //!JwtAuthGuard + CASL
     @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, TaskEntity))
+
+
+##### Helmet:
+- Đặt tiêu đề HTTP để bảo mật
+- $ npm i --save helmet
+- ts.config.json: 
   
 
 ###### DBeaver hỗ trợ PostgreSQL:

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ForbiddenError } from '@casl/ability';
-import { ConflictException, HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/auth/entity/user.entity';
 import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
@@ -24,18 +24,24 @@ export class CategoriesService {
 
     const caslAbility = this.caslAbilityFactory.createForUser(user)
     const newCategory = await this.categoryRepository.create(category);
-    ForbiddenError.from(caslAbility)
-      .setMessage('only admin !')
-      .throwUnlessCan(Action.Create, newCategory);
 
+  
+   
     try {
+      ForbiddenError.from(caslAbility)
+      .throwUnlessCan(Action.Create, newCategory);
+  
       await this.categoryRepository.save(newCategory);
     } catch (err) {
       if (err.code === '23505') {
         throw new ConflictException(
           'Duplicate Category Name already exists',
         );
-      } else {
+      } 
+      else if (err instanceof ForbiddenError) {
+        throw new ForbiddenException(err.message);
+      }
+      else {
         throw new InternalServerErrorException();
       }
     }
@@ -67,20 +73,38 @@ export class CategoriesService {
     //todo: CASL isAdmin isCreator:
     const caslAbility = this.caslAbilityFactory.createForUser(user)
     const categoryToUpdate = await this.getCategoryById(id);
-    ForbiddenError.from(caslAbility)
-      .setMessage('only admin!')
+
+    try {
+      ForbiddenError.from(caslAbility)
       .throwUnlessCan(Action.Update, categoryToUpdate);
       
-    await this.categoryRepository.update(id, updateCategoryDto);
-    const updatedCategory = await this.categoryRepository.findOne(id, {
-      relations: ['taskToCategories'],
-    });
+      await this.categoryRepository.update(id, updateCategoryDto);
 
-    if (updatedCategory) {
-      return updatedCategory;
-    } else {
-      throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
+      const updatedCategory = await this.categoryRepository.findOne(id, {
+        relations: ['taskToCategories'],
+      });
+      
+      if (updatedCategory) {
+        return updatedCategory;
+      } else {
+        throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
+      }
+
+    } catch (err) {
+      if (err.code === '23505') {
+        throw new ConflictException(
+          'Duplicate Category Name already exists',
+        );
+      } 
+      else if (err instanceof ForbiddenError) {
+        throw new ForbiddenException(err.message);
+      }
+      else {
+        throw new InternalServerErrorException();
+      }
     }
+
+  
    
   }
 
@@ -89,13 +113,23 @@ export class CategoriesService {
     //todo: CASL isAdmin isCreator:
     const caslAbility = this.caslAbilityFactory.createForUser(user)
     const categoryToDelete = await this.getCategoryById(id);
-    ForbiddenError.from(caslAbility)
-      .setMessage('only admin!')
+    
+    try {
+      ForbiddenError.from(caslAbility)
       .throwUnlessCan(Action.Delete, categoryToDelete);
       
-    const deletedCategory = await this.categoryRepository.delete(id);
-    if (!deletedCategory.affected) {
-      throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
+      const deletedCategory = await this.categoryRepository.delete(id);
+      if (!deletedCategory.affected) {
+        throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
+      }
+
+    } catch (err) {
+      if (err instanceof ForbiddenError) {
+        throw new ForbiddenException(err.message);
+      }
+      else {
+        throw new InternalServerErrorException();
+      }
     }
   }
 }

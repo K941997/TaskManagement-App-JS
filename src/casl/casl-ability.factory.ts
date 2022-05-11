@@ -6,7 +6,7 @@ import { CategoryEntity } from "src/categories/entity/category.entity";
 import { TaskEntity } from "src/tasks/entity/task.entity";
 import { Action } from "./casl-action.enum";
 
-type Subjects = InferSubjects<typeof TaskEntity | typeof CategoryEntity | typeof UserEntity> | 'all';
+export type Subjects = InferSubjects<typeof TaskEntity | typeof CategoryEntity | typeof UserEntity> | 'all';
 
 export type AppAbility = Ability<[Action, Subjects]>;
 
@@ -28,8 +28,13 @@ export class CaslAbilityFactory {
       cannot(Action.Update, TaskEntity).because('You are not admin or creator!');
       cannot(Action.Delete, TaskEntity).because('You are not admin or creator!');
 
-      cannot(Action.Update, UserEntity).because('You are not admin or creator!')
-      cannot(Action.Delete, UserEntity).because('You are not admin or creator!')
+      cannot(Action.Update, UserEntity).because('You are not admin or creator!');
+      cannot(Action.Delete, UserEntity).because('You are not admin or creator!');
+
+      cannot(Action.Create, CategoryEntity).because('You are not admin');
+      cannot(Action.Update, CategoryEntity).because('You are not admin');
+      cannot(Action.Delete, CategoryEntity).because('You are not admin');
+
     }
 
     can(Action.Update, TaskEntity, {authorId: user.id}); // only if they own it

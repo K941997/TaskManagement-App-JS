@@ -31,7 +31,10 @@ export class CategoryEntity {
   // @ManyToMany(() => TaskEntity, (task: TaskEntity) => task.categories)
   // public tasks: TaskEntity[];
   //!Custom ManyToMany: (Dùng)
-  @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.category, {nullable: true})
+  @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.category,
+    {nullable: true, eager: true,
+      cascade: true})
+  //!Eager: true, Cascade: true để lưu vào database
   //!Không onDelete: "CASCADE" thì Xóa Relation TaskToCategory Không Xóa luôn Category
   // @JoinColumn({ referencedColumnName: 'categoryId' })
   public taskToCategories: TaskToCategoryEntity[];
