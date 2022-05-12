@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Module } from '@nestjs/common';
+import { CacheInterceptor, CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TasksModule } from './tasks/tasks.module';
@@ -14,12 +14,16 @@ import { CaslModule } from './casl/casl.module'; //CASL Role isCreator
 
 import { MongooseModule } from '@nestjs/mongoose'; //MongoDB
 import { CategoriesMongoDbModule } from './categories-mongo-db/categories-mongo-db.module';
+import { RedisCacheModule } from './redisCache/redis.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ 
       isGlobal: true,
     }),
+
+    
     
     TypeOrmModule.forRoot(), //!TypeOrm PostgreSQL Database
 
@@ -34,13 +38,13 @@ import { CategoriesMongoDbModule } from './categories-mongo-db/categories-mongo-
 
     CaslModule, //!CASL Role isCreator
 
-    MongooseModule.forRoot(process.env.CONNECT_MONGODB, {
+    MongooseModule.forRoot(process.env.CONNECT_MONGODB, { //!MongoDB Database
       connectionName: 'categories', //connectionName ở categoriesMongo.module
       useNewUrlParser: true, //dùng để unique: true ở Schema
       useUnifiedTopology: true,
       autoIndex: true,
       
-    }), //!MongoDB Database
+    }),
     //.env CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?
   
     // MongooseModule.forRoot(process.env.CONNECT_MONGODB, {
@@ -51,8 +55,19 @@ import { CategoriesMongoDbModule } from './categories-mongo-db/categories-mongo-
       
     // }), UserTypesModule //!MongoDB Database
     //.env CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?
+    
+  
+    // RedisCacheModule, //!Redis Cache: (+ Docker)
+    // CacheModule.register({ //!Cache Global
+    //   // ttl: 60, //thời gian hết hạn của bộ nhớ Cache
+    //   // max: 100, //maximum number of items in Cache
+    //   isGlobal: true,
+    // }),
+  
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+  ],
 })
 export class AppModule {}

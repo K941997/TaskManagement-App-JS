@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { ConflictException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER, ConflictException, HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 // import { v4 as uuid } from 'uuid'; //tạo id ngẫu nhiên
 import { CreateTaskDto } from './dto/createTask.dto';
 import { GetTasksSearchFilterDto } from './dto/getTasksSearchFilter.dto';
@@ -16,6 +16,8 @@ import { Action } from 'src/casl/casl-action.enum';
 import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
 import { TaskToCategoryEntity } from './entity/taskToCategory.entity';
 import { CategoriesService } from 'src/categories/categories.service';
+import { Cache } from 'cache-manager';
+import { GET_CACHE_KEY } from 'src/cacheManully/cacheKey.constant';
 
 @Injectable()
 export class TasksService {
@@ -25,7 +27,20 @@ export class TasksService {
 
     private caslAbilityFactory: CaslAbilityFactory, //CASL Role
 
+    // @Inject(CACHE_MANAGER) //!Cache Manually: 
+    // private cacheManager: Cache
+
   ) {}
+
+  // //!Clear Cache Manually:
+  // async clearCache() { //Clear Cache when Create Update Delete
+  //   const keys: string[] = await this.cacheManager.store.keys();
+  //   keys.forEach((key) => {
+  //     if (key.startsWith(GET_CACHE_KEY)) {
+  //       this.cacheManager.del(key);
+  //     }
+  //   })
+  // }
 
  
   //!Create A Task + Relation Database (author + categories):
@@ -71,6 +86,7 @@ export class TasksService {
     }
 
     await task.save()
+    // await this.clearCache(); //!Cache Manually
     return task;
 
   }
@@ -105,6 +121,8 @@ export class TasksService {
     if (!taskFound) { //Error Handle:
       throw new NotFoundException(`Task with ID ${id} not found !`);
     } else {
+
+      // console.log(this.cacheManager.get('key'))
       return taskFound;
     }
    
@@ -152,6 +170,7 @@ export class TasksService {
     }
 
     await updatedTask.save();
+    // await this.clearCache(); //!Cache Manually
     return updatedTask;
   }
 
@@ -161,5 +180,6 @@ export class TasksService {
     if (result.affected === 0) { //Error Handle:
       throw new NotFoundException(`Task with ID ${id} is not found !`);
     }
+    // await this.clearCache(); //!Cache Manually
   }
 }

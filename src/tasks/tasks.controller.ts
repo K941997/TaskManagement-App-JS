@@ -1,6 +1,10 @@
 /* eslint-disable prettier/prettier */
 import {
   Body,
+  CacheInterceptor,
+  CacheKey,
+  CacheTTL,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   ForbiddenException,
@@ -14,6 +18,7 @@ import {
   Query,
   Req,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -38,8 +43,9 @@ import { Action } from 'src/casl/casl-action.enum';
 import { ForbiddenError } from '@casl/ability';
 import { PoliciesGuard } from 'src/casl/policiesGuard.guard';
 import { CheckPolicies } from 'src/casl/casl-ability.decorator';
+import { GET_CACHE_KEY } from 'src/cacheManully/cacheKey.constant';
 @Controller('tasks') //localhost:3000/api/tasks/
-
+@UseInterceptors(ClassSerializerInterceptor) //!In-memory Cache:
 export class TasksController {
   constructor(
     private tasksService: TasksService,
@@ -66,6 +72,9 @@ export class TasksController {
 
   //!Get All Tasks + Get All Tasks Search Filter:
   @Get() //Nếu thêm query thì sẽ hiện Tasks theo query hoặc không thêm query thì hiện tất cả:
+  @UseInterceptors(CacheInterceptor) //!In-memory Cache | Cache Manually:
+  // @CacheKey(GET_CACHE_KEY) //!Cache Manually
+  // @CacheTTL(120) //!Cache Manually
   getTasksSearchFilter(
     @Query(ValidationPipe) filterDto: GetTasksSearchFilterDto,
   ): Promise<TaskEntity[]> {
@@ -74,6 +83,7 @@ export class TasksController {
 
   //!Get Task By Id:
   @Get('/:id')
+  @UseInterceptors(CacheInterceptor) //!In-memory Cache:
   getTaskById(@Param('id', ParseIntPipe) id: number): Promise<TaskEntity> {
     return this.tasksService.getTaskById(id);
   }
@@ -107,7 +117,6 @@ export class TasksController {
 
   //!Delete Task Advanced CASL Role isAdmin isCreator:
   @Delete('/:id')
-  
   //!Cách 1:
   //todo: CASL Basic:
   @UseGuards(JwtAuthGuard) //!JwtAuthGuard + CASL
