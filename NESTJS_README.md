@@ -831,14 +831,12 @@ $ npm install express-session @types/express-session
   + Create Task + Category bị lỗi Category Not Found
 # (Đã xong) CASL CRUD User: Xóa User Xóa Task, Không Xóa Categories
 # (Đã xong) Read User By /:username Vì trùng /:id: thay = /username/:username
-# (Đã Xong) Relation OneToOne, Relation ManyToMany change OneToMany + ManyToOne in Tables: "Tasks And Categories", "Tasks", "Categories"
+# (Đã Xong) Relation OneToOne, Relation ManyToMany change OneToMany + ManyToOne in Tables: "TaskToCategories", "Tasks", "Categories"
 # (Đã xong) LogOut (Frontend làm)
 # (Đã Xong) .env trong Migrations
 # (Đã Xong) học DBeaver
 # (Đã xong) CRUD with MongoDB:
-
-# (Chưa Xong) CRUD theo kiểu khác
-# (Chưa xong) CASL Super Admin, Normal Admin
+# (Đã xong) CASL Super Admin, Normal Admin
 # (Chưa Xong) TypeOrm Query Builder in Service
 # (Chưa Xong) Scheduling, Queues, Events. (Dùng để gửi mail chúc mừng sinh nhật khách)
 # (Chưa Xong) Upload file
@@ -849,6 +847,75 @@ $ npm install express-session @types/express-session
 # (Chưa Xong) Docker (Chứa C#, PHP, NodeJS, Java, ...)
 # (Chưa Xong) Microservice (Optional)
 
+##############################TECHNIQUES###################################
+###### Caching:
+# 1. Settings:
+- $ npm install cache-manager
+  $ npm install -D @types/cache-manager
+- Chỉ dùng ở @Get Controller
+
+- task.module:
+  CacheModule.register({
+    ttl: 5, //thời gian hết hạn của bộ nhớ Cache
+    max: 100, //maximum number of items in Cache
+  })
+
+# a. In-memory Cache (No Global): (Có Nhược điểm -> Vote dùng với Redis Cache)
+
+- task.controller, category.controller, user.controller:
+  @Controller('tasks')
+  @UseInterceptors(ClassSerializerInterceptor) //!In-memory Cache:
+  export class TasksController {
+  ...
+  @Get()
+  @UseInterceptors(CacheInterceptor) //!In-memory Cache:
+  ...
+  }
+
+# b. Cache Manually (No Global): (Tăng hiệu suất)
+
+- task.service:
+  constructor: {
+    ...
+    @Inject(CACHE_MANAGER) //!Cache Manually: 
+    private cacheManager: Cache
+  }
+
+# Invalidating Cache:
+- create folder cacheManually
+- task.service:
+  + clearCache(): dùng cho Create Update Delete
+  async clearCache() {
+    const keys: string[] = await this.cacheManager.store.keys();
+    keys.forEach((key) => {
+      if (key.startsWith(GET_POSTS_CACHE_KEY)) {
+        this.cacheManager.del(key);
+      }
+    })
+  }
+
+  ...
+  + Create Update Delete:
+  async createTask () {
+    ...
+     await this.clearCache(); //Cache Manually
+  } 
+ 
+- task.controller:
+  @Get()
+  @UseInterceptors(CacheInterceptor) //!In-memory Cache | Cache Manually:
+  @CacheKey(GET_CACHE_KEY) //!Cache Manually
+  @CacheTTL(120) //!Cache Manually
+ 
+
+# c. Redis Cache (+ Docker): (Vote dùng)
+- create folder redis
+
+
+
+
+
+##############################SERCURITY###################################
 ###### Authentication SignUp SignIn:
 # 1. Session Cookies:
 $ npm install @nestjs/jwt passport-jwt @types/passport-jwt cookie-parser @types/cookie-parser
