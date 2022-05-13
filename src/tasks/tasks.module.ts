@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskRepository } from './task.repository';
 import { AuthModule } from 'src/auth/auth.module';
 import { CaslModule } from 'src/casl/casl.module';
-import { RedisCacheModule } from 'src/redisCache/redis.module';
+import { RedisCacheModule } from 'src/cacheRedis/redis.module';
 
 @Module({
   imports: [

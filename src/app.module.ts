@@ -14,7 +14,7 @@ import { CaslModule } from './casl/casl.module'; //CASL Role isCreator
 
 import { MongooseModule } from '@nestjs/mongoose'; //MongoDB
 import { CategoriesMongoDbModule } from './categories-mongo-db/categories-mongo-db.module';
-import { RedisCacheModule } from './redisCache/redis.module';
+import { RedisCacheModule } from './cacheRedis/redis.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
