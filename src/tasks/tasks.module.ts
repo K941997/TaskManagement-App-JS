@@ -15,6 +15,7 @@ import { RedisCacheModule } from 'src/cacheRedis/redis.module';
 
     CaslModule, //!CASL Role
 
+    RedisCacheModule, //!Redis Cache: (+ Docker)
     CacheModule.register({ //!In-memory Cache | Cache Manually:
       ttl: 10, //thời gian hết hạn của bộ nhớ Cache, sau khi xóa sẽ cập nhật danh sách sau 10s
       max: 100, //maximum number of items in Cache

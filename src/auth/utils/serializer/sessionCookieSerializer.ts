@@ -8,7 +8,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class SessionCookieSerializer extends PassportSerializer {
 
-  //!JWT + Session Cookie:  
+  //!SessionCookies:  
   serializeUser(user: any, done: (err: Error, user: any) => void): any {
     done(null, user);
   }

@@ -25,7 +25,7 @@ import { RequestWithUser } from './requestWithUser.interface';
 import { request, Response } from 'express';
 import { LocalAuthGuard } from './utils/guard/localAuthGuard.guard';
 import * as bcrypt from 'bcrypt';
-import { AuthenticatedGuard } from './utils/guard/authGuard.guard';
+// import { AuthenticatedGuard } from './utils/guard/authGuard.guard';
 import { JwtAuthGuard } from './utils/guard/jwtAuthGuard.guard';
 import { AppAbility, CaslAbilityFactory } from 'src/casl/casl-ability.factory';
 import { PoliciesGuard } from 'src/casl/policiesGuard.guard';
@@ -62,8 +62,7 @@ export class AuthController {
   }
 
   // //!Protected (Session Cookie Không cần nhập tài khoản):
-  // // @UseGuards(AuthenticatedGuard) //!Remove SessionCookie to use Guard JWTToken return access_token = BearerToken check SessionCookie:
-  // @UseGuards(JwtAuthGuard)  //Todo: JWTAuthGuard Bearer Token (for Protected after Login):
+  // @UseGuards(AuthenticatedGuard) //!Remove SessionCookie to use Guard JWTToken return access_token = BearerToken check SessionCookie:
   // @Get('/protected')
   // getHello(@Request() req): string{
    
