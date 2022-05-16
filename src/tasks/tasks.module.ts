@@ -25,6 +25,7 @@ import { AuditMiddleware } from 'src/middlewares/audit.middleware';
   providers: [TasksService],
   controllers: [TasksController],
 })
+
 export class TasksModule implements NestModule { //!Middleware
   configure(consumer: MiddlewareConsumer) {
     consumer

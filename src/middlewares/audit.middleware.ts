@@ -10,8 +10,4 @@ export class AuditMiddleware implements NestMiddleware {
         console.log("Logging DELETE request Headers ", req.headers);
         next()
     }
-
- 
-    
-
 }

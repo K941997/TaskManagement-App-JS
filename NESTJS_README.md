@@ -837,17 +837,44 @@ $ npm install express-session @types/express-session
 # (Đã Xong) học DBeaver
 # (Đã xong) CRUD with MongoDB:
 # (Đã xong) CASL Super Admin, Normal Admin
+# (Chưa xong) Middlewares
+# (Đã xong) Redis
+# (Đã xong) Cache In-memory, Cache Manually, Cache Redis (Vote In-memory + Redis, Cache dùng ở Controller)
 # (Chưa Xong) TypeOrm Query Builder in Service
 # (Chưa Xong) Scheduling, Queues, Events. (Dùng để gửi mail chúc mừng sinh nhật khách)
 # (Chưa Xong) Upload file
 # (Chưa Xong) GraphQL
 # (Chưa Xong) TypeScript
 # (Chưa Xong) Websocket Streaming
-# (Chưa xong) Redis, Kafka (Cache dữ liệu nhanh)
+# (Chưa xong) Kafka
 # (Chưa Xong) Docker (Chứa C#, PHP, NodeJS, Java, ...)
 # (Chưa Xong) Microservice (Optional)
 
+##############################OVERVIEW###################################
+###### Middleware:
+# 1. Settings:
+- create folder middlewares:
+  + audit.middleware.ts
+    @Injectable()
+    export class AuditMiddleware implements NestMiddleware {
+        use(req: Request, res: Response, next: Function) {
+            console.log("Logging DELETE request Headers ", req.headers);
+            next()
+        }
+    }
+- task.module:
+  export class TasksModule implements NestModule { //!Middleware
+    configure(consumer: MiddlewareConsumer) {
+      consumer
+        .apply(AuditMiddleware)
+        .forRoutes({ path: 'tasks/*', method: RequestMethod.DELETE }) //todo: task.controller Delete
+    } 
+  }
+
 ##############################TECHNIQUES###################################
+###### Redis:
+- Cài vào ổ C
+
 ###### Caching:
 # 1. Settings:
 - $ npm install cache-manager
@@ -860,8 +887,7 @@ $ npm install express-session @types/express-session
     max: 100, //maximum number of items in Cache
   })
 
-# a. In-memory Cache (No Global): (Có Nhược điểm -> Vote dùng với Redis Cache)
-
+# a. Cache In-memory (No Global): (Vote dùng + Cache Redis)
 - task.controller, category.controller, user.controller:
   @Controller('tasks')
   @UseInterceptors(ClassSerializerInterceptor) //!In-memory Cache:
@@ -873,7 +899,6 @@ $ npm install express-session @types/express-session
   }
 
 # b. Cache Manually (No Global): (Tăng hiệu suất)
-
 - task.service:
   constructor: {
     ...
@@ -881,7 +906,7 @@ $ npm install express-session @types/express-session
     private cacheManager: Cache
   }
 
-# Invalidating Cache:
+# invalidating Cache:
 - create folder cacheManually
 - task.service:
   + clearCache(): dùng cho Create Update Delete
@@ -908,8 +933,17 @@ $ npm install express-session @types/express-session
   @CacheTTL(120) //!Cache Manually
  
 
-# c. Redis Cache (+ Docker): (Vote dùng)
-- create folder redis
+# c. Cache Redis (Vote dùng + Cache In-memory):
+- Cài Redis
+- create folder cacheRedis:
+  + redis.module
+  + redis.service
+- task.module:
+    RedisCacheModule, //!Redis Cache: (+ Docker)
+    CacheModule.register({ //!In-memory Cache | Cache Manually:
+      ttl: 10, //thời gian hết hạn của bộ nhớ Cache, sau khi xóa sẽ cập nhật danh sách sau 10s
+      max: 100, //maximum number of items in Cache
+    }),
 
 
 
