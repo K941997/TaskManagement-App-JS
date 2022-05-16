@@ -82,7 +82,7 @@ export class AuthService {
   //Remove SessionCookie to Use Guard JWTToken return access_token = BearerToken check SessionCookie:
   async loginPayloadJWTToken (user: any) {
     const payload = {sub: user.id, role: user.role, isAdmin: user.isAdmin} //todo: send payload to jwtStrategy
-
+    
     return {
       ...user,
       access_token: this.jwtService.sign(payload)

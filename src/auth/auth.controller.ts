@@ -56,7 +56,8 @@ export class AuthController {
     const user = req.user;
     user.password = undefined;
 
-    console.log(user, 'Hello')
+    console.log(req.headers, "Đây là Headers")
+    console.log(user, "Đây là User")
     // user.tasks = undefined; //Dùng user.entity eager: false
     // return {msg: ' Logged In ', user }; //Remove SessionCookie to use Guard JWTToken return access_token = BearerToken check SessionCookie:
     
