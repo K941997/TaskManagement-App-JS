@@ -817,7 +817,7 @@ $ npm install express-session @types/express-session
 
 
 
-
+##############################SERCURITY###################################
 # (Đã Xong) JWTToken thay cho SessionCookies
 # (Đã Xong) Đang gặp lỗi Many To Many tạo 1 Task chứa Categories [1,2,3] 2, 3 không tồn tại -> bị Internal server error
 # (Đã Xong) Nếu nhập API phải để "categoryIds": [] thì mới được rỗng, nếu ko nhập "categoryIds" thì sẽ lỗi 
@@ -837,12 +837,33 @@ $ npm install express-session @types/express-session
 # (Đã Xong) học DBeaver
 # (Đã xong) CRUD with MongoDB:
 # (Đã xong) CASL Super Admin, Normal Admin
-# (Chưa xong) Middlewares
+# (Đã xong) Middlewares
+# (Chưa Xong) TypeOrm Query Builder in Service
+# (Chưa Xong) Helmet
+# (Chưa Xong) CORS
+# (Chưa Xong) CSRF Protection CSURF
+# (Chưa Xong) Rate limiting (Giới hạn tốc độ)
+##############################TECHNIQUES###################################
 # (Đã xong) Redis
 # (Đã xong) Cache In-memory, Cache Manually, Cache Redis (Vote In-memory + Redis, Cache dùng ở Controller)
-# (Chưa Xong) TypeOrm Query Builder in Service
-# (Chưa Xong) Scheduling, Queues, Events. (Dùng để gửi mail chúc mừng sinh nhật khách)
+# (Chưa xong) Serialization (Tạo Custom, Exclude-Trả về Loại bỏ hiển thị, Expose-Trả về Phơi bày, Transform, SerializeOptions)
+# (Chưa Xong) Versioning (for Microservice)
+# (Chưa Xong) Task Scheduling, Queues, Events. (Dùng để gửi mail chúc mừng sinh nhật khách)
+# (Chưa Xong) Cookie-parser
+# (Chưa Xong) Compression (Nén để tăng tốc độ ứng dụng)
 # (Chưa Xong) Upload file
+# (Chưa Xong) HTTP Module (Axios)
+# (Chưa Xong) Server Sent Event (Real-time 1 chiều Đồ thị, News Feed khác WebSockets Real-time 2 chiều Chat Online, Game)
+##############################OTHERS###################################
+# (Chưa xong) Pagination Infinite Scroll (Phân trang)
+# (Chưa Xong) Offset Pagination (Phân trang)
+# (Chưa xong) Refresh JWT Token
+# (Chưa Xong) Verify Link Nodemailer
+# (Chưa Xong) Verify Phone Sendgrid Twilio
+# (Chưa Xong) Email Google Authent
+# (Chưa Xong) Transactions (Giao dịch)
+# (Chưa Xong) Elastic Search (+ Docker)
+# (Chưa Xong) Unit Test, E2E
 # (Chưa Xong) GraphQL
 # (Chưa Xong) TypeScript
 # (Chưa Xong) Websocket Streaming

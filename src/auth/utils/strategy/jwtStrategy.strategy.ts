@@ -26,9 +26,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any){ //todo: payload from jwttoken login in Service
+  async validate(payload: any){ //todo: payload from jwttoken login in auth.Service
     const user = await this.userRepository.find({id: payload.sub});
-    console.log(user)
+
     return user;
     // return { user, id: payload.sub, role: payload.role, isAdmin: payload.isAdmin };
   }

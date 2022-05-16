@@ -55,8 +55,17 @@ export class AuthController {
   async signIn(@Request() req){ //!req lấy thông tin từ LocalAuthGuard
     const user = req.user;
     user.password = undefined;
+
+    console.log(user, 'Hello')
     // user.tasks = undefined; //Dùng user.entity eager: false
     // return {msg: ' Logged In ', user }; //Remove SessionCookie to use Guard JWTToken return access_token = BearerToken check SessionCookie:
+    
+
+    // const cookie = this.authService.loginPayloadJWTToken(user.id);
+    // console.log(cookie);
+    // const a = res.setHeader ('Set-Cookie', await cookie);
+    // console.log(a)
+
     return this.authService.loginPayloadJWTToken(user)
    
   }
