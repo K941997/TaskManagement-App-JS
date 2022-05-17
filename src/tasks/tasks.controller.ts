@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable prettier/prettier */
 import {
   Body,
@@ -70,16 +71,30 @@ export class TasksController {
 
   }
 
-  //!Get All Tasks + Get All Tasks Search Filter:
+  // //!Get All Tasks + Get All Tasks Search Filter:
+  // @Get() //Nếu thêm query thì sẽ hiện Tasks theo query hoặc không thêm query thì hiện tất cả:
+  // @UseInterceptors(CacheInterceptor) //!In-memory Cache | Cache Manually:
+  // // @CacheKey(GET_CACHE_KEY) //!Cache Manually
+  // // @CacheTTL(120) //!Cache Manually
+  // getTasksSearchFilter(
+  //   @Query(ValidationPipe) filterDto: GetTasksSearchFilterDto,
+  // ): Promise<TaskEntity[]> {
+  //   return this.tasksService.getTasksSearchFilter(filterDto);
+  // }
+
+  //!Pagination Infinite Scroll:
   @Get() //Nếu thêm query thì sẽ hiện Tasks theo query hoặc không thêm query thì hiện tất cả:
   @UseInterceptors(CacheInterceptor) //!In-memory Cache | Cache Manually:
   // @CacheKey(GET_CACHE_KEY) //!Cache Manually
   // @CacheTTL(120) //!Cache Manually
-  getTasksSearchFilter(
-    @Query(ValidationPipe) filterDto: GetTasksSearchFilterDto,
+  getTasksSelected(
+    @Query('take') take: number = 1,
+    @Query('skip') skip: number = 1
   ): Promise<TaskEntity[]> {
-    return this.tasksService.getTasksSearchFilter(filterDto);
+    take = take > 20 ? 20 : take;
+    return this.tasksService.getTasksSelected(take, skip);
   }
+
 
   //!Get Task By Id:
   @Get('/:id')

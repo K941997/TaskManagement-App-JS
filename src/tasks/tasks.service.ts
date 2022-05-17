@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable prettier/prettier */
 import { CACHE_MANAGER, ConflictException, HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 // import { v4 as uuid } from 'uuid'; //tạo id ngẫu nhiên
@@ -18,6 +19,7 @@ import { TaskToCategoryEntity } from './entity/taskToCategory.entity';
 import { CategoriesService } from 'src/categories/categories.service';
 import { Cache } from 'cache-manager';
 import { GET_CACHE_KEY } from 'src/cacheManully/cacheKey.constant';
+import { from, Observable } from 'rxjs';
 
 @Injectable()
 export class TasksService {
@@ -111,6 +113,14 @@ export class TasksService {
 
     const tasks = await query.getMany();
     return tasks;
+  }
+
+
+  //!Pagination Infinite Scroll:
+  getTasksSelected(take: number = 10, skip: number = 0): Promise<TaskEntity[]> {
+      return (this.taskRepository.findAndCount({take, skip}).then(([tasks]) => {
+        return <TaskEntity[]>tasks
+      }))
   }
 
 
