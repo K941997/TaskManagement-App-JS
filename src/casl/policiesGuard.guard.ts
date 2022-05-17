@@ -8,6 +8,7 @@ import { PolicyHandler } from "./policyhandler.handler";
 
 /* eslint-disable prettier/prettier */
 //!Advanced CASL: Implementing a PoliciesGuard:
+//todo: Chưa Custom nên không dùng được
 @Injectable()
 export class PoliciesGuard implements CanActivate {
   

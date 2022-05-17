@@ -7,6 +7,7 @@ import {
   CacheTTL,
   ClassSerializerInterceptor,
   Controller,
+  DefaultValuePipe,
   Delete,
   ForbiddenException,
   Get,
@@ -45,6 +46,7 @@ import { ForbiddenError } from '@casl/ability';
 import { PoliciesGuard } from 'src/casl/policiesGuard.guard';
 import { CheckPolicies } from 'src/casl/casl-ability.decorator';
 import { GET_CACHE_KEY } from 'src/cacheManully/cacheKey.constant';
+import { Pagination } from 'nestjs-typeorm-paginate';
 @Controller('tasks') //localhost:3000/api/tasks/
 @UseInterceptors(ClassSerializerInterceptor) //!In-memory Cache:
 export class TasksController {
@@ -82,17 +84,34 @@ export class TasksController {
   //   return this.tasksService.getTasksSearchFilter(filterDto);
   // }
 
-  //!Pagination Infinite Scroll:
+  // //!Pagination Infinite Scroll:
+  // @Get() //Nếu thêm query thì sẽ hiện Tasks theo query hoặc không thêm query thì hiện tất cả:
+  // @UseInterceptors(CacheInterceptor) //!In-memory Cache | Cache Manually:
+  // // @CacheKey(GET_CACHE_KEY) //!Cache Manually
+  // // @CacheTTL(120) //!Cache Manually
+  // getTasksSelected(
+  //   @Query('take') take: number = 1,
+  //   @Query('skip') skip: number = 1
+  // ): Promise<TaskEntity[]> {
+  //   take = take > 20 ? 20 : take;
+  //   return this.tasksService.getTasksSelected(take, skip);
+  // }
+
+  //!Pagination:
   @Get() //Nếu thêm query thì sẽ hiện Tasks theo query hoặc không thêm query thì hiện tất cả:
   @UseInterceptors(CacheInterceptor) //!In-memory Cache | Cache Manually:
   // @CacheKey(GET_CACHE_KEY) //!Cache Manually
   // @CacheTTL(120) //!Cache Manually
-  getTasksSelected(
-    @Query('take') take: number = 1,
-    @Query('skip') skip: number = 1
-  ): Promise<TaskEntity[]> {
-    take = take > 20 ? 20 : take;
-    return this.tasksService.getTasksSelected(take, skip);
+  index(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  ): Promise<Pagination<TaskEntity>> {
+    limit = limit > 100 ? 100 : limit;
+    return this.tasksService.paginate({
+      page,
+      limit,
+      route: 'http://localhost:3000/api/tasks',
+    });
   }
 
 
@@ -133,14 +152,13 @@ export class TasksController {
   //!Delete Task Advanced CASL Role isAdmin isCreator:
   @Delete('/:id')
   //!Cách 1:
-  //todo: CASL Basic:
-  @UseGuards(JwtAuthGuard) //!JwtAuthGuard + CASL
+  @UseGuards(JwtAuthGuard) //!JwtAuthGuard
   async deleteTask(
     @Param('id', ParseIntPipe) id: number,
-    @Req() req: RequestWithUser, //req from JwtAuthGuard
+    @Req() req: RequestWithUser,
   ): Promise<void> {
     const user = req.user
-   
+    //todo: CASL Basic:
     //todo: CASL isAdmin isCreator:
     const caslAbility = this.caslAbilityFactory.createForUser(user)
     const taskToDelete = await this.getTaskById(id);

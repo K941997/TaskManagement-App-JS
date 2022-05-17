@@ -49,8 +49,8 @@ export class AuthService {
     }
   }
 
-  //!Verify Password: LocalStrategy Xác thực người dùng: 
-  //Todo: for ValidateUser: LocalStrategy
+  //!Verify Password: (for LocalStrategy) Xác thực người dùng: 
+  //Todo: for ValidateUser: (for LocalStrategy)
   private async verifyPassword(plainTextPassword: string, hashedPassword: string) {
     const isPasswordMatching = await bcrypt.compare(
       plainTextPassword,
@@ -61,11 +61,11 @@ export class AuthService {
     }
   }
 
-  //!ValidateUser: LocalStrategy Xác thực người dùng: 
+  //!ValidateUser: (for LocalStrategy) Xác thực người dùng: 
   //Todo: for LocalStrategy for LocalGuard (for Login): 
   public async validateUser(username: string, plainTextPassword: string) {
     try {
-      const user = await this.findOneUser(username);
+      const user = await this.userRepository.findOne({username});
 
       await this.verifyPassword(plainTextPassword, user.password);
       return user;
@@ -76,9 +76,9 @@ export class AuthService {
     }
   }
 
-  //!LoginPayloadJWTToken: JWTStrategy Đăng nhập tạo Token:
+  //!LoginPayloadJWTToken: Đăng nhập tạo Token, (for JWTStrategy):
   //Todo: for AuthController Login:
-  //Todo: JWTStrategy Bearer Token (for Protected after Login):
+  //Todo: Tạo ra JWTStrategy Bearer Token (for Protected after Login):
   //Remove SessionCookie to Use Guard JWTToken return access_token = BearerToken check SessionCookie:
   async loginPayloadJWTToken (user: any) {
     const payload = {sub: user.id, role: user.role, isAdmin: user.isAdmin} //todo: send payload to jwtStrategy
@@ -104,32 +104,6 @@ export class AuthService {
     return allUsers;
   }
 
-  //!Get One User: (Không cần dùng)
-  //!(Đã xong) Vì trùng /:id:
-  async findOneUser(username: string): Promise<UserEntity> {
-    const user = await this.userRepository.findOne({ where: { username: username }  })
-    console.log(user);
-    
-    if (user) {
-      return user;
-    } else {
-      throw new HttpException('User with this username does not exist', HttpStatus.NOT_FOUND);
-    }
-
-    // const user1 = await this.userRepository.createQueryBuilder("user")
-    //   .where("user.username = :username")
-    //   .getOne()
-    // return user1;
-
-    // const user = await this.userRepository.createQueryBuilder('user')
-    //   .select('user.id', 'user.username', { role: 'roles.name' })
-    //   .innerJoin('roles', 'roles.id', 'users.roleId')
-    //   .where('email', email)
-    //   .first();
-
-  // return user;
-  }
-
   //!Get User By Id: (Cần dùng):
   //!(Đã xong) Vì trùng /:username:
   async findUserById(id: number): Promise<UserEntity> {
@@ -139,6 +113,19 @@ export class AuthService {
       throw new NotFoundException(`User with ID ${id} not found !`);
     } else {
       return userFound;
+    }
+  }
+
+  //!Get One User: (Không cần dùng)
+  //!(Đã xong) Vì trùng /:id:
+  async findUserByUsername(username: string): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({ where: { username: username }  })
+    console.log(user);
+    
+    if (user) {
+      return user;
+    } else {
+      throw new HttpException('User with this username does not exist', HttpStatus.NOT_FOUND);
     }
   }
 

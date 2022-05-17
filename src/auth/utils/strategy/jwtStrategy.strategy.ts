@@ -9,7 +9,7 @@ import { UserRepository } from 'src/auth/user.repository';
 dotenv.config()
 
 
-//!JWTStrategy:
+//!JWTStrategy: (for CRUD after Login)
 //Todo: JwtStrategy to JwtAuthGuard:
 //Todo: Bearer Token (for Protected after Login):
 @Injectable()

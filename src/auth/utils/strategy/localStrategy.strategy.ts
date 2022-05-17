@@ -8,7 +8,7 @@ import { UserEntity } from "../../entity/user.entity";
 import { UserRepository } from "../../user.repository";
 
 
-//!LocalStrategy :
+//!LocalStrategy: (for Login)
 //Todo: LocalStrategy to LocalAuthGuard:
 //Todo: JWT Access_Token (for Login):
 @Injectable()

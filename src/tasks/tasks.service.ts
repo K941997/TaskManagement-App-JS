@@ -21,6 +21,12 @@ import { Cache } from 'cache-manager';
 import { GET_CACHE_KEY } from 'src/cacheManully/cacheKey.constant';
 import { from, Observable } from 'rxjs';
 
+import {
+  paginate,
+  Pagination,
+  IPaginationOptions,
+} from 'nestjs-typeorm-paginate';
+
 @Injectable()
 export class TasksService {
   constructor (
@@ -29,7 +35,7 @@ export class TasksService {
 
     private caslAbilityFactory: CaslAbilityFactory, //CASL Role
 
-    // @Inject(CACHE_MANAGER) //!Cache Manually: 
+    // @Inject(CACHE_MANAGER) //!(Cache Manually) 
     // private cacheManager: Cache
 
   ) {}
@@ -45,6 +51,8 @@ export class TasksService {
   // }
 
  
+
+ 
   //!Create A Task + Relation Database (author + categories):
   async createTask(createTaskDto: CreateTaskDto, author: UserEntity): Promise<TaskEntity> {
 
@@ -54,7 +62,7 @@ export class TasksService {
     // taskNew.description = description;
     // taskNew.status = TaskStatus.OPEN;
     // taskNew.author = author;
-    // taskNew.taskToCategory = [] ; //!ManyToMany Advanced Relation Xem lai
+    // taskNew.taskToCategory = [] ; //todo: ManyToMany Advanced Relation Xem lai
 
     const task = this.taskRepository.create(
       createTaskDto
@@ -65,7 +73,7 @@ export class TasksService {
     const newTask = await task.save();
 
 
-    //!Tạo 2 categories giống nhau, trả về 1 category:
+    //todo: Tạo 2 categories giống nhau, trả về 1 category:
     const arr = [];
     for(let i = 0; i<categoryIds.length; i++){
       if(arr.indexOf(categoryIds[i]) === -1)
@@ -116,11 +124,32 @@ export class TasksService {
   }
 
 
-  //!Pagination Infinite Scroll:
-  getTasksSelected(take: number = 10, skip: number = 0): Promise<TaskEntity[]> {
-      return (this.taskRepository.findAndCount({take, skip}).then(([tasks]) => {
-        return <TaskEntity[]>tasks
-      }))
+  // //!Pagination Infinite Scroll:
+  // getTasksSelected(take: number = 10, skip: number = 0): Promise<TaskEntity[]> {
+  //     return (this.taskRepository.findAndCount({take, skip}).then(([tasks]) => {
+  //       return <TaskEntity[]>tasks
+  //     }))
+  // }
+
+  // //!Pagination Infinite Scroll:
+  // getTasksSelected(take: number = 10, skip: number = 0): Promise<TaskEntity[]> {
+  //   return (
+  //     this.taskRepository
+  //       .createQueryBuilder('task')
+  //       .innerJoinAndSelect('task.author', 'author')
+  //       .orderBy('task.createdAt', 'DESC') //todo: Mới nhất đến cũ nhất
+  //       .take(take)
+  //       .skip(skip)
+  //       .getMany()
+  //   )
+  // }
+
+  //!Pagination: (Phân trang)
+  async paginate(options: IPaginationOptions): Promise<Pagination<TaskEntity>> {
+    const queryBuilder = this.taskRepository.createQueryBuilder('task');
+    queryBuilder.orderBy('task.createdAt', 'DESC'); //todo: Mới nhất đến cũ nhất
+
+    return paginate<TaskEntity>(queryBuilder, options);
   }
 
 

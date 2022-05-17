@@ -108,7 +108,7 @@ export class AuthController {
   //!(Đã xong) Vì trùng /:id: (Thay = /username/:username)
   @Get('/username/:username')
   getUserInfoByUsername(@Param('username') username: string) {
-    return this.authService.findOneUser(username);
+    return this.authService.findUserByUsername(username);
   }
 
   //!Update User Advanced CASL Role:
