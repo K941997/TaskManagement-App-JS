@@ -47,6 +47,8 @@ import { PoliciesGuard } from 'src/casl/policiesGuard.guard';
 import { CheckPolicies } from 'src/casl/casl-ability.decorator';
 import { GET_CACHE_KEY } from 'src/cacheManully/cacheKey.constant';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { from, Observable } from 'rxjs';
+import { TaskInterface } from './entity/task.interface';
 @Controller('tasks') //localhost:3000/api/tasks/
 @UseInterceptors(ClassSerializerInterceptor) //!In-memory Cache:
 export class TasksController {
@@ -103,15 +105,31 @@ export class TasksController {
   // @CacheKey(GET_CACHE_KEY) //!Cache Manually
   // @CacheTTL(120) //!Cache Manually
   index(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-  ): Promise<Pagination<TaskEntity>> {
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('title') title: string
+  ): Observable<Pagination<TaskInterface>> {
+    // limit = limit > 100 ? 100 : limit;
+    // return ( this.tasksService.paginate({
+    //   page: Number(page),
+    //   limit,
+    //   route: 'http://localhost:3000/api/tasks',
+    // }));
+
+
     limit = limit > 100 ? 100 : limit;
-    return this.tasksService.paginate({
-      page,
-      limit,
-      route: 'http://localhost:3000/api/tasks',
-    });
+    if (title === null || title === undefined) {
+      return this.tasksService.paginate({ 
+        page: Number(page), 
+        limit: Number(limit), 
+        route: 'http://localhost:3000/api/tasks',  
+      });
+  } else if (title) {
+      return this.tasksService.paginateFilterByTitle(
+          { page: Number(page), limit: Number(limit), route: 'http://localhost:3000/api/tasks' },
+          {title}
+      )
+  }
   }
 
 

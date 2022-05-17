@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from './entity/task.entity';
 import { TaskStatus } from './taskStatus.enum';
 import { UpdateTaskDto } from './dto/updateTask.dto';
-import { getRepository, Repository, UpdateResult } from 'typeorm';
+import { getRepository, Like, Repository, UpdateResult } from 'typeorm';
 import { UserEntity } from 'src/auth/entity/user.entity';
 import { CategoryEntity } from 'src/categories/entity/category.entity';
 import { ForbiddenError } from '@casl/ability';
@@ -26,6 +26,8 @@ import {
   Pagination,
   IPaginationOptions,
 } from 'nestjs-typeorm-paginate';
+import { map } from 'rxjs/operators';
+import { TaskInterface } from './entity/task.interface';
 
 @Injectable()
 export class TasksService {
@@ -101,35 +103,28 @@ export class TasksService {
 
   }
 
-  //!Get All Tasks + Get All Tasks Search Filter:
-  async getTasksSearchFilter(filterDto: GetTasksSearchFilterDto): Promise<TaskEntity[]> {
-    const { status, search } = filterDto;
-    const query = this.taskRepository
-      .createQueryBuilder('task') //!TypeOrm Query Builder
-      .orderBy("task.id")
-      .leftJoinAndSelect('task.taskToCategories', 'category');
+  // //!Get All Tasks + Get All Tasks Search Filter: (Dùng được)
+  // async getTasksSearchFilter(filterDto: GetTasksSearchFilterDto): Promise<TaskEntity[]> {
+  //   const { status, search } = filterDto;
+  //   const query = this.taskRepository
+  //     .createQueryBuilder('task') //!TypeOrm Query Builder
+  //     .orderBy("task.id")
+  //     .leftJoinAndSelect('task.taskToCategories', 'category');
       
-    if (status) {
-      query.andWhere('task.status = :status', { status });
-    }
-    if (search) {
-      query.andWhere(
-        '(task.title LIKE :search OR task.description LIKE :search)',
-        { search: `%${search}%` },
-      );
-    }
+  //   if (status) {
+  //     query.andWhere('task.status = :status', { status });
+  //   }
+  //   if (search) {
+  //     query.andWhere(
+  //       '(task.title LIKE :search OR task.description LIKE :search)',
+  //       { search: `%${search}%` },
+  //     );
+  //   }
 
-    const tasks = await query.getMany();
-    return tasks;
-  }
-
-
-  // //!Pagination Infinite Scroll:
-  // getTasksSelected(take: number = 10, skip: number = 0): Promise<TaskEntity[]> {
-  //     return (this.taskRepository.findAndCount({take, skip}).then(([tasks]) => {
-  //       return <TaskEntity[]>tasks
-  //     }))
+  //   const tasks = await query.getMany();
+  //   return tasks;
   // }
+
 
   // //!Pagination Infinite Scroll:
   // getTasksSelected(take: number = 10, skip: number = 0): Promise<TaskEntity[]> {
@@ -144,14 +139,54 @@ export class TasksService {
   //   )
   // }
 
-  //!Pagination: (Phân trang)
-  async paginate(options: IPaginationOptions): Promise<Pagination<TaskEntity>> {
-    const queryBuilder = this.taskRepository.createQueryBuilder('task');
-    queryBuilder.orderBy('task.createdAt', 'DESC'); //todo: Mới nhất đến cũ nhất
+  // //!Pagination: (Phân trang)
+  // paginate(options: IPaginationOptions): Observable<Pagination<TaskEntity>> {
+  //   const queryBuilder = this.taskRepository.createQueryBuilder('task');
+  //   queryBuilder.orderBy('task.createdAt', 'DESC'); //todo: Mới nhất đến cũ nhất
 
-    return paginate<TaskEntity>(queryBuilder, options);
-  }
+  //   return from (paginate<TaskEntity>(queryBuilder, options));
+  // }
 
+  paginate(options: IPaginationOptions): Observable<Pagination<TaskInterface>> {
+    return from(paginate<TaskInterface>(this.taskRepository, options)).pipe(
+        map((usersPageable: Pagination<TaskInterface>) => {
+            return usersPageable;
+        })
+    )
+}
+
+  //!Search + Pagination:
+  paginateFilterByTitle(options: IPaginationOptions, task: TaskInterface): Observable<Pagination<TaskInterface>>{
+    return from(this.taskRepository.findAndCount({
+        skip: Number(options.page) * Number(options.limit) || 0,
+        take: Number(options.limit) || 10,
+        order: {id: "ASC"},
+        select: ['id', 'title', 'author', 'description', 'status', 'createdAt', 'taskToCategories'],
+        where: [
+            { title: Like(`%${task.title}%`)}
+        ]
+    })).pipe(
+        map(([tasks, totalTasks]) => {
+            const tasksPageable: Pagination<TaskInterface> = {
+                items: tasks,
+                links: {
+                    first: options.route + `?limit=${options.limit}`,
+                    previous: options.route + ``,
+                    next: options.route + `?limit=${options.limit}&page=${Number(options.page) + 1}`,
+                    last: options.route + `?limit=${options.limit}&page=${Math.ceil(totalTasks / Number(options.limit))}`
+                },
+                meta: {
+                    currentPage: Number(options.page),
+                    itemCount: tasks.length,
+                    itemsPerPage: Number(options.limit),
+                    totalItems: totalTasks,
+                    totalPages: Math.ceil(totalTasks / Number(options.limit))
+                }
+            };              
+            return tasksPageable;
+        })
+    ) 
+}
 
   //!Get Task By Id:
   async getTaskById(id: number): Promise<TaskEntity> {
