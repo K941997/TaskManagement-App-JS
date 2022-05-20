@@ -14,6 +14,9 @@ import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
 import { ForbiddenError } from '@casl/ability';
 import { Action } from 'src/casl/casl-action.enum';
 
+import * as dotenv from 'dotenv';
+dotenv.config()
+
 @Injectable() //!@Injectable: injected Service to Controller
 export class AuthService {
   constructor(
@@ -80,13 +83,69 @@ export class AuthService {
   //Todo: for AuthController Login:
   //Todo: Tạo ra JWTStrategy Bearer Token (for Protected after Login):
   //Remove SessionCookie to Use Guard JWTToken return access_token = BearerToken check SessionCookie:
-  async loginPayloadJWTToken (user: any) {
+
+  //!Access Token: (For Login)
+  public getCookieWithJwtAccessToken(user: any) {
     const payload = {sub: user.id, role: user.role, isAdmin: user.isAdmin} //todo: send payload to jwtStrategy
-    
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET_KEY,
+      expiresIn: process.env.JWT_TIME_EXPIRES_IN
+    });
+    return `Authentication = ${token}; HttpOnly; Path = /; Max-Age = ${process.env.JWT_TIME_EXPIRES_IN}`
+  }
+
+  //!Refresh Token: (For Login)
+  public getCookieWithJwtRefreshToken(userId: number) {
+    const payload = { userId }
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+      expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
+    });
+    const cookie = `Refresh = ${token}; HttpOnly; Path = /; Max-Age = ${process.env.JWT_REFRESH_TOKEN_EXPIRES_IN}`;
     return {
-      ...user,
-      access_token: this.jwtService.sign(payload)
+      cookie,
+      token
     }
+  }
+
+  //!CurrentRefreshToken Hash: (For Login)
+  async setCurrentRefreshToken(refreshToken: string, userId: number) {
+    const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.userRepository.update(userId, {
+      currentHashedRefreshToken
+    });
+  }
+
+
+  //!GetUserIfRFMatches: (For jwtRFStrategy For Refresh)
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+    const user = await this.findUserById(userId);
+ 
+    const isRefreshTokenMatching = await bcrypt.compare(
+      refreshToken,
+      user.currentHashedRefreshToken
+    );
+ 
+    if (isRefreshTokenMatching) {
+      return user;
+    }
+  }
+
+  
+  //!LogOut:
+  public getCookiesForLogOut() {
+    return [
+      'Authentication=; HttpOnly; Path=/; Max-Age=0',
+      'Refresh=; HttpOnly; Path=/; Max-Age=0'
+    ];
+  }
+
+
+  //!RemoveRefreshTokenWhenLogOut: (For LogOut)
+  async removeRefreshToken(user:any) {
+    return this.userRepository.update(user, {
+      currentHashedRefreshToken: null
+    });
   }
   
   
@@ -176,4 +235,7 @@ export class AuthService {
   // public getCookieForLogOut() {
   //   return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   // }
+
+
+  
 }

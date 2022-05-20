@@ -32,10 +32,10 @@ export class CategoryEntity {
   // public tasks: TaskEntity[];
   //!Custom ManyToMany: (Dùng)
   @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.category,
-    {nullable: true, eager: true,
-      cascade: true})
-  //!Eager: true, Cascade: true để lưu vào database
-  //!Không onDelete: "CASCADE" thì Xóa Relation TaskToCategory Không Xóa luôn Category
+    {nullable: true, eager: true, cascade: true})
+  //!eager: true, Cascade: true để lưu vào database, dùng find sẽ hiển thị, còn QueryBuilder thì dùng LeftJoinAndSelect
+  //Không onDelete: "CASCADE" thì Xóa Relation TaskToCategory Không Xóa luôn Category
   // @JoinColumn({ referencedColumnName: 'categoryId' })
+  //!JoinColumn() (Chỉ được đặt 1 bên) dùng cho OneToOne, ManyToOne(Có thể bỏ qua)
   public taskToCategories: TaskToCategoryEntity[];
 }

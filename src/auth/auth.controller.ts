@@ -16,12 +16,14 @@ import {
   Put,
   ParseIntPipe,
   Delete,
-  Patch
+  Patch,
+  ClassSerializerInterceptor,
+  UseInterceptors
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/authCredentials.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { RequestWithUser } from './requestWithUser.interface';
+import { RequestWithUser } from './interface/requestWithUser.interface';
 import { request, Response } from 'express';
 import { LocalAuthGuard } from './utils/guard/localAuthGuard.guard';
 import * as bcrypt from 'bcrypt';
@@ -33,8 +35,10 @@ import { CheckPolicies } from 'src/casl/casl-ability.decorator';
 import { Action } from 'src/casl/casl-action.enum';
 import { UserEntity } from './entity/user.entity';
 import { UpdateUserDto } from './dto/updateUser.dto';
+import { JwtRefreshTokenGuard } from './utils/guard/jwtRefreshTokenGuard.guard';
 
 @Controller('auth') //localhost:3000/api/auth
+@UseInterceptors(ClassSerializerInterceptor) //!Serialize (trả về nhưng ko hiển thị @Exclude Entity)
 export class AuthController {
   constructor(
     private readonly authService: AuthService, //!private: vừa khai báo vừa injected vừa khởi tạo
@@ -49,33 +53,71 @@ export class AuthController {
 
 
   //!SignIn:
+  //todo: SignIn save (AccessToken, RefreshToken in Cookie) (CurrentRefreshToken in Database)
   @HttpCode(200)
   @UseGuards(LocalAuthGuard) //!LocalStrategy Xác thực người dùng
   @Post('/signin')
-  async signIn(@Request() req){ //!req lấy thông tin từ LocalAuthGuard
+  async signIn(@Request() req: RequestWithUser){ //!req lấy thông tin từ LocalAuthGuard
     const user = req.user;
     user.password = undefined;
 
-    console.log(req.headers, "Đây là Headers")
-    console.log(user, "Đây là User")
     // user.tasks = undefined; //Dùng user.entity eager: false
     // return {msg: ' Logged In ', user }; //Remove SessionCookie to use Guard JWTToken return access_token = BearerToken check SessionCookie:
-    
-
     // const cookie = this.authService.loginPayloadJWTToken(user.id);
-    // console.log(cookie);
     // const a = res.setHeader ('Set-Cookie', await cookie);
     // console.log(a)
 
-    return this.authService.loginPayloadJWTToken(user)
-   
+    //!Access Token:
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(user) 
+
+    //!Refresh Token:
+    const { 
+      cookie: refreshTokenCookie, 
+      token: refreshToken 
+    } 
+    = this.authService.getCookieWithJwtRefreshToken(user.id);
+
+    //!CurrentRefreshToken Hash:
+    await this.authService.setCurrentRefreshToken(refreshToken, user.id)
+
+    //!Cookie:
+    req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
+
+    //!Return:
+    return {
+      ...user,
+      accessTokenCookie, 
+      refreshTokenCookie
+    }
+
   }
+
+
+  //!Refresh:
+  @UseGuards(JwtRefreshTokenGuard) //jwtRFStrategy
+  @Post('refresh')
+  refresh(@Req() request: RequestWithUser) {
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(request.user.id);
+ 
+    request.res.setHeader('Set-Cookie', accessTokenCookie);
+    return request.user;
+  }
+
+  //!LogOut:
+  //todo: LogOut = Access Token -> CurrentRefreshToken = Null
+  @UseGuards(JwtAuthGuard)
+  @Post('signout')
+  @HttpCode(200)
+  async logOut(@Req() request: RequestWithUser) {
+    await this.authService.removeRefreshToken(request.user.id);
+    request.res.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
+  }
+
 
   // //!Protected (Session Cookie Không cần nhập tài khoản):
   // @UseGuards(AuthenticatedGuard) //!Remove SessionCookie to use Guard JWTToken return access_token = BearerToken check SessionCookie:
   // @Get('/protected')
   // getHello(@Request() req): string{
-   
   //   return req.user; //!return with jwtStrategy
   // }
 

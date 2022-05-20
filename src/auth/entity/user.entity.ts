@@ -14,6 +14,7 @@ import * as bcrypt from 'bcrypt';
 import { TaskEntity } from 'src/tasks/entity/task.entity';
 import { Role } from '../role/role.enum';
 import Address from './address.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 @Unique(['username']) //Không trùng lặp username
@@ -42,14 +43,24 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
+  @Column({
+    nullable: true
+  })
+  @Exclude() //Trả về nhưng ko hiển thị
+  public currentHashedRefreshToken?: string;
+
   @OneToMany(() => TaskEntity, (task: TaskEntity) => task.author, { eager: false, cascade: true })
-  //eager: false (Không load tasks)
+  //!eager: true (Chỉ đặt 1 bên) để lưu vào database, dùng find sẽ hiển thị, còn QueryBuilder thì dùng LeftJoinAndSelect
   tasks: TaskEntity[];
 
   @OneToOne(() => Address, {nullable: true, eager: true, cascade: true})
-  @JoinColumn( //!JoinColumn() (Chỉ được đặt 1 bên) dùng cho OneToOne, ManyToOne(Có thể bỏ qua)
+  @JoinColumn( 
     { name: "address_id", referencedColumnName: "id" }
   )
+  //!eager: true (Chỉ đặt 1 bên) để lưu vào database, dùng find sẽ hiển thị, còn QueryBuilder thì dùng LeftJoinAndSelect
+  //!JoinColumn() (Chỉ được đặt 1 bên) dùng cho OneToOne, ManyToOne(Có thể bỏ qua)
   address: Address;
+
+
 
 }

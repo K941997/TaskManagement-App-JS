@@ -31,9 +31,9 @@ dotenv.config()
     }), 
 
     JwtModule.register({ //!JWTModule register to use Guard JWTToken return access_token = BearerToken check SessionCookie
-      secret: process.env.SECRET_KEY_JWT_TOKEN, //protect move to .env, fill in jwtStrategy //!Thiếu dotenv.config()
+      secret: process.env.JWT_SECRET_KEY, //protect move to .env, fill in jwtStrategy //!Thiếu dotenv.config()
       signOptions: {
-        expiresIn: '3600s',
+        expiresIn: process.env.JWT_TIME_EXPIRES_IN,
       },
     }),
 

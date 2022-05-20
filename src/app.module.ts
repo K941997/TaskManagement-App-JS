@@ -23,8 +23,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       isGlobal: true,
     }),
 
-    
-    
     TypeOrmModule.forRoot(), //!TypeOrm PostgreSQL Database
 
     AuthModule,

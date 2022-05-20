@@ -40,12 +40,13 @@ export class TaskEntity extends BaseEntity {
   authorId: number;
 
   @ManyToOne(() => UserEntity, (author: UserEntity) => author.tasks, { eager: false, onDelete: "CASCADE"}) 
-  //eager: false (Không load author)
+  //!eager: true (Chỉ đặt 1 bên) để lưu vào database, dùng find sẽ hiển thị, còn QueryBuilder thì dùng LeftJoinAndSelect
   //onDelete: "CASCADE" Xóa User Xóa luôn Task
   //onDelete: "SET NULL" Đặt authorId = null nếu xóa author
-  @JoinColumn( //!JoinColumn() (Chỉ được đặt 1 bên) dùng cho OneToOne, ManyToOne(Có thể bỏ qua)
+  @JoinColumn( 
     { name: "authorId", referencedColumnName: "id" }
-  ) 
+  )
+  //JoinColumn() (Chỉ được đặt 1 bên) dùng cho OneToOne, ManyToOne(Có thể bỏ qua)
   author: UserEntity; 
 
   //!ManyToMany: (Không dùng)
@@ -56,8 +57,9 @@ export class TaskEntity extends BaseEntity {
   //!Custom ManyToMany: (Dùng)
   @OneToMany(() => TaskToCategoryEntity, taskToCategory => taskToCategory.task,
     {nullable: true,  eager: true, cascade: true})
-  //!Eager: true, Cascade: true để lưu vào database
+  //!eager: true, Cascade: true để lưu vào database, dùng find sẽ hiển thị, còn QueryBuilder thì dùng LeftJoinAndSelect
   //!Không onDelete: "CASCADE" thì Xóa Relation TaskToCategory Không Xóa luôn Task
+  //!JoinColumn() (Chỉ được đặt 1 bên) dùng cho OneToOne, ManyToOne(Có thể bỏ qua)
   // @JoinColumn({ referencedColumnName: 'taskId' })
   public taskToCategories: TaskToCategoryEntity[];
 

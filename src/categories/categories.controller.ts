@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RequestWithUser } from 'src/auth/requestWithUser.interface';
+import { RequestWithUser } from 'src/auth/interface/requestWithUser.interface';
 import { JwtAuthGuard } from 'src/auth/utils/guard/jwtAuthGuard.guard';
 import { CheckPolicies } from 'src/casl/casl-ability.decorator';
 import { AppAbility, CaslAbilityFactory } from 'src/casl/casl-ability.factory';

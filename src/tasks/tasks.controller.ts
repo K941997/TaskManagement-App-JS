@@ -34,7 +34,7 @@ import { TaskEntity } from './entity/task.entity';
 import { TasksService } from './tasks.service';
 import { TaskStatus } from './taskStatus.enum';
 import { UserEntity } from 'src/auth/entity/user.entity';
-import { RequestWithUser } from 'src/auth/requestWithUser.interface';
+import { RequestWithUser } from 'src/auth/interface/requestWithUser.interface';
 import { CategoriesService } from 'src/categories/categories.service';
 import { JwtAuthGuard } from 'src/auth/utils/guard/jwtAuthGuard.guard';
 import { Roles } from 'src/auth/role/roles.decorator';
@@ -99,37 +99,35 @@ export class TasksController {
   //   return this.tasksService.getTasksSelected(take, skip);
   // }
 
-  //!Pagination:
+  //!Get All Tasks + Pagination + SearchFilterByTitle:
   @Get() //Nếu thêm query thì sẽ hiện Tasks theo query hoặc không thêm query thì hiện tất cả:
   @UseInterceptors(CacheInterceptor) //!In-memory Cache | Cache Manually:
   // @CacheKey(GET_CACHE_KEY) //!Cache Manually
   // @CacheTTL(120) //!Cache Manually
   index(
-    @Query('page') page: number = 1,
+    @Query('page') page: number = 1, //page * limit = offset
     @Query('limit') limit: number = 10,
     @Query('title') title: string
   ): Observable<Pagination<TaskInterface>> {
-    // limit = limit > 100 ? 100 : limit;
-    // return ( this.tasksService.paginate({
-    //   page: Number(page),
-    //   limit,
-    //   route: 'http://localhost:3000/api/tasks',
-    // }));
-
-
-    limit = limit > 100 ? 100 : limit;
-    if (title === null || title === undefined) {
-      return this.tasksService.paginate({ 
-        page: Number(page), 
-        limit: Number(limit), 
-        route: 'http://localhost:3000/api/tasks',  
-      });
-  } else if (title) {
-      return this.tasksService.paginateFilterByTitle(
-          { page: Number(page), limit: Number(limit), route: 'http://localhost:3000/api/tasks' },
-          {title}
-      )
-  }
+      limit = limit > 100 ? 100 : limit;
+      if (title === null || title === undefined) {
+        return this.tasksService.paginate(
+          {
+            page: Number(page), 
+            limit: Number(limit), 
+            route: 'http://localhost:3000/api/tasks',  
+          },
+        );
+    } else if (title) {
+        return this.tasksService.paginateFilterByTitle(
+            {
+              page: Number(page),
+              limit: Number(limit),
+              route: 'http://localhost:3000/api/tasks',
+            },
+            { title }
+        );
+    }
   }
 
 

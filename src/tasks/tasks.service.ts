@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from './entity/task.entity';
 import { TaskStatus } from './taskStatus.enum';
 import { UpdateTaskDto } from './dto/updateTask.dto';
-import { getRepository, Like, Repository, UpdateResult } from 'typeorm';
+import { getRepository, ILike, Like, Repository, UpdateResult } from 'typeorm';
 import { UserEntity } from 'src/auth/entity/user.entity';
 import { CategoryEntity } from 'src/categories/entity/category.entity';
 import { ForbiddenError } from '@casl/ability';
@@ -88,7 +88,6 @@ export class TasksService {
       const category = await getRepository(CategoryEntity).findOne(arr[i]);
 
       if (category) {
-
         const taskToCategory = new TaskToCategoryEntity();
         taskToCategory.taskId = newTask.id
         taskToCategory.categoryId = category.id
@@ -139,29 +138,30 @@ export class TasksService {
   //   )
   // }
 
-  // //!Pagination: (Phân trang)
-  // paginate(options: IPaginationOptions): Observable<Pagination<TaskEntity>> {
-  //   const queryBuilder = this.taskRepository.createQueryBuilder('task');
-  //   queryBuilder.orderBy('task.createdAt', 'DESC'); //todo: Mới nhất đến cũ nhất
+  //!Get All Tasks + Pagination: (Phân trang)
+  paginate(options: IPaginationOptions): Observable<Pagination<TaskInterface>> {
+    const queryBuilder = this.taskRepository.createQueryBuilder('task');
+    queryBuilder.orderBy('task.createdAt', 'DESC'); //todo: Mới nhất đến cũ nhất
 
-  //   return from (paginate<TaskEntity>(queryBuilder, options));
+    return from (paginate<TaskInterface>(queryBuilder, options));
+  }
+
+  // paginate(options: IPaginationOptions): Observable<Pagination<TaskInterface>> {
+  //   return from(paginate<TaskInterface>(this.taskRepository, options)).pipe(
+  //       map((usersPageable: Pagination<TaskInterface>) => {
+  //           return usersPageable;
+  //       })
+  //   )
   // }
 
-  paginate(options: IPaginationOptions): Observable<Pagination<TaskInterface>> {
-    return from(paginate<TaskInterface>(this.taskRepository, options)).pipe(
-        map((usersPageable: Pagination<TaskInterface>) => {
-            return usersPageable;
-        })
-    )
-}
-
-  //!Search + Pagination:
+  //!Search + Pagination: (Tìm kiếm + Phân trang)
   paginateFilterByTitle(options: IPaginationOptions, task: TaskInterface): Observable<Pagination<TaskInterface>>{
     return from(this.taskRepository.findAndCount({
-        skip: Number(options.page) * Number(options.limit) || 0,
+        skip: Number(options.page) * Number(options.limit) || 0, //!page * limit = offset
         take: Number(options.limit) || 10,
         order: {id: "ASC"},
-        select: ['id', 'title', 'author', 'description', 'status', 'createdAt', 'taskToCategories'],
+        relations: ['author', 'taskToCategories'],
+        select: ['id', 'title', 'description', 'status', 'createdAt'],
         where: [
             { title: Like(`%${task.title}%`)}
         ]
