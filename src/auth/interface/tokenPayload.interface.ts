@@ -1,4 +1,4 @@
 /* eslint-disable prettier/prettier */
-interface TokenPayload {
+export interface TokenPayload {
     userId: number;
   }

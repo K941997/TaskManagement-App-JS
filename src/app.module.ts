@@ -28,7 +28,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     AuthModule,
     TasksModule,
     CategoriesModule,
-    CategoriesMongoDbModule,
+    // CategoriesMongoDbModule,
 
     PassportModule.register({ //!Session Cookie PassportJS
       session: true,
@@ -36,13 +36,13 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 
     CaslModule, //!CASL Role isCreator
 
-    MongooseModule.forRoot(process.env.CONNECT_MONGODB, { //!MongoDB Database
-      connectionName: 'categories', //connectionName ở categoriesMongo.module
-      useNewUrlParser: true, //dùng để unique: true ở Schema
-      useUnifiedTopology: true,
-      autoIndex: true,
+    // MongooseModule.forRoot(process.env.CONNECT_MONGODB, { //!MongoDB Database
+    //   connectionName: 'categories', //connectionName ở categoriesMongo.module
+    //   useNewUrlParser: true, //dùng để unique: true ở Schema
+    //   useUnifiedTopology: true,
+    //   autoIndex: true,
       
-    }),
+    // }),
     //.env CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?
   
     // MongooseModule.forRoot(process.env.CONNECT_MONGODB, {

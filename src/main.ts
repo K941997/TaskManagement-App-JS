@@ -11,6 +11,8 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(cookieParser()); //!Cookie for Refresh Token request?.cookies?.Refresh;
+   
   //!Thêm hậu tố api -> localhost:3000/api/
   app.setGlobalPrefix('api');
 

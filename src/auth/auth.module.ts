@@ -16,6 +16,8 @@ import { RolesGuard } from './role/roleGuard.guard';
 import { CaslModule } from 'src/casl/casl.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import * as dotenv from 'dotenv';
+import { JwtRefreshTokenStrategy } from './utils/strategy/jwtRefreshTokenStrategy.strategy';
+import JwtRefreshTokenGuard from './utils/guard/jwtRefreshTokenGuard.guard';
 dotenv.config()
 
 // const passportModule = PassportModule.register({ defaultStrategy: 'jwt' });
@@ -37,6 +39,7 @@ dotenv.config()
       },
     }),
 
+
     TypeOrmModule.forFeature([UserRepository]),
 
     CaslModule,
@@ -44,7 +47,7 @@ dotenv.config()
   ],
 
   // providers: [AuthService, JwtStrategy, LocalStrategy, SessionCookieSerializer], //!SessionCookies
-  providers: [AuthService, JwtStrategy, LocalStrategy, JwtAuthGuard, RolesGuard], //!JWT Remove SessionCookies, RolesGuard RBAC not CASL
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtAuthGuard, RolesGuard, JwtRefreshTokenStrategy, JwtRefreshTokenGuard], //!JWT Remove SessionCookies, RolesGuard RBAC not CASL
 
   controllers: [AuthController],
 

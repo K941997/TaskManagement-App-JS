@@ -35,7 +35,8 @@ import { CheckPolicies } from 'src/casl/casl-ability.decorator';
 import { Action } from 'src/casl/casl-action.enum';
 import { UserEntity } from './entity/user.entity';
 import { UpdateUserDto } from './dto/updateUser.dto';
-import { JwtRefreshTokenGuard } from './utils/guard/jwtRefreshTokenGuard.guard';
+import JwtRefreshGuard from './utils/guard/jwtRefreshTokenGuard.guard';
+import JwtRefreshTokenGuard from './utils/guard/jwtRefreshTokenGuard.guard';
 
 @Controller('auth') //localhost:3000/api/auth
 @UseInterceptors(ClassSerializerInterceptor) //!Serialize (trả về nhưng ko hiển thị @Exclude Entity)
@@ -61,12 +62,6 @@ export class AuthController {
     const user = req.user;
     user.password = undefined;
 
-    // user.tasks = undefined; //Dùng user.entity eager: false
-    // return {msg: ' Logged In ', user }; //Remove SessionCookie to use Guard JWTToken return access_token = BearerToken check SessionCookie:
-    // const cookie = this.authService.loginPayloadJWTToken(user.id);
-    // const a = res.setHeader ('Set-Cookie', await cookie);
-    // console.log(a)
-
     //!Access Token:
     const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(user) 
 
@@ -77,13 +72,13 @@ export class AuthController {
     } 
     = this.authService.getCookieWithJwtRefreshToken(user.id);
 
-    //!CurrentRefreshToken Hash:
+    //CurrentRefreshToken Hash:
     await this.authService.setCurrentRefreshToken(refreshToken, user.id)
 
-    //!Cookie:
+    //Cookie:
     req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
 
-    //!Return:
+    //Return:
     return {
       ...user,
       accessTokenCookie, 
@@ -94,13 +89,16 @@ export class AuthController {
 
 
   //!Refresh:
-  @UseGuards(JwtRefreshTokenGuard) //jwtRFStrategy
+  @UseGuards(JwtRefreshTokenGuard)
   @Post('refresh')
-  refresh(@Req() request: RequestWithUser) {
-    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(request.user.id);
+  refresh(@Req() request) {
+    const user = request.user
+    console.log(user, "User in Refresh Controller")
+
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(user);
  
     request.res.setHeader('Set-Cookie', accessTokenCookie);
-    return request.user;
+    return user;
   }
 
   //!LogOut:
@@ -126,7 +124,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   getSelfInfo(@Req() request) { //!request lấy thông tin từ JWTToken
     const user = request.user;
-    console.log(user);
     user.password = undefined;
     return user; //không có logic ở service nên return user luôn
   }

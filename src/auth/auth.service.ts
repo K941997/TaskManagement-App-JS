@@ -15,6 +15,7 @@ import { ForbiddenError } from '@casl/ability';
 import { Action } from 'src/casl/casl-action.enum';
 
 import * as dotenv from 'dotenv';
+import { TokenPayload } from './interface/tokenPayload.interface';
 dotenv.config()
 
 @Injectable() //!@Injectable: injected Service to Controller
@@ -73,20 +74,20 @@ export class AuthService {
       await this.verifyPassword(plainTextPassword, user.password);
       return user;
     } catch (error) {
-      console.log(username, plainTextPassword, 'Lỗi');
+      console.log(username, plainTextPassword, 'Lỗi Validate User');
 
       throw new HttpException('Sai tài khoản', HttpStatus.BAD_REQUEST);
     }
   }
 
-  //!LoginPayloadJWTToken: Đăng nhập tạo Token, (for JWTStrategy):
-  //Todo: for AuthController Login:
-  //Todo: Tạo ra JWTStrategy Bearer Token (for Protected after Login):
-  //Remove SessionCookie to Use Guard JWTToken return access_token = BearerToken check SessionCookie:
 
   //!Access Token: (For Login)
   public getCookieWithJwtAccessToken(user: any) {
-    const payload = {sub: user.id, role: user.role, isAdmin: user.isAdmin} //todo: send payload to jwtStrategy
+    console.log(user, "User AccessToken Service")
+
+    const payload = {sub: user.id} //todo: send payload to jwtStrategy
+    console.log(payload, "payload User AccessTokenService")
+    
     const token = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET_KEY,
       expiresIn: process.env.JWT_TIME_EXPIRES_IN
@@ -94,9 +95,11 @@ export class AuthService {
     return `Authentication = ${token}; HttpOnly; Path = /; Max-Age = ${process.env.JWT_TIME_EXPIRES_IN}`
   }
 
+
   //!Refresh Token: (For Login)
   public getCookieWithJwtRefreshToken(userId: number) {
-    const payload = { userId }
+    const payload  = {sub: userId} //todo: send payload to jwtRefreshTokenStrategy
+    console.log(payload, "payload User RefreshToken Service")
     const token = this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_TOKEN_SECRET,
       expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
@@ -107,6 +110,8 @@ export class AuthService {
       token
     }
   }
+
+  
 
   //!CurrentRefreshToken Hash: (For Login)
   async setCurrentRefreshToken(refreshToken: string, userId: number) {
@@ -119,18 +124,24 @@ export class AuthService {
 
   //!GetUserIfRFMatches: (For jwtRFStrategy For Refresh)
   async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+
+    console.log("Đang vào getUserIfRefreshTokenMatches")
+
     const user = await this.findUserById(userId);
+    if (!user) {
+      console.log("Ko tìm thấy user")
+    }
  
     const isRefreshTokenMatching = await bcrypt.compare(
       refreshToken,
       user.currentHashedRefreshToken
     );
- 
     if (isRefreshTokenMatching) {
       return user;
+    } else {
+      console.log("GetUserIfRFMatches ko Match")
     }
   }
-
   
   //!LogOut:
   public getCookiesForLogOut() {
