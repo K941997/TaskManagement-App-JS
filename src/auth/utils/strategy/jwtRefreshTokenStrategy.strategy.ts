@@ -24,41 +24,45 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
   ) {
     super({
       //Cách 1:
-      // jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-      //   return request?.cookies?.Refresh;
-      // }]),
-      // secretOrKey: process.env.JWT_REFRESH_TOKEN_SECRET,
-      // passReqToCallback: true,
-
-      //Cách 2:
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
+        return request?.cookies?.Refresh;
+      }]),
       secretOrKey: process.env.JWT_REFRESH_TOKEN_SECRET,
       passReqToCallback: true,
+
+      //Cách 2:
+      // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // secretOrKey: process.env.JWT_REFRESH_TOKEN_SECRET,
+      // passReqToCallback: true,
     });
   }
  
   //Cách 1:
-  // async validate(request: Request, payload: any) {
-  //   console.log(payload, "Payload in JwtStrategyRefreshToken")
 
-  //   const refreshToken = request.cookies?.Refresh;
-  //   console.log(refreshToken, "Refresh Token in Strategy")
-  //   return this.authService.getUserIfRefreshTokenMatches(refreshToken, payload.sub);
-  // }
+  async validate(request: Request, payload: any) {
+    console.log("Đang vào JwtStrategyRefreshToken...")
+    
+    console.log(payload, "Payload in JwtStrategyRefreshToken")
+
+    const refreshToken = request.cookies?.Refresh;
+    console.log(refreshToken, "Refresh Token in Strategy")
+
+    return this.authService.getUserIfRefreshTokenMatches(refreshToken, payload.userId);
+  }
 
   //Cách 2:
-  async validate(req: Request, payload: any) {
-    console.log(payload, "payload JwtRefreshTokenStrategy")
+  // async validate(req: Request, payload: any) {
+  //   console.log(payload, "payload JwtRefreshTokenStrategy")
 
-    const refreshToken = req
-      ?.get('authorization')
-      ?.replace('Bearer', '')
-      .trim();
-    console.log(refreshToken, "Refresh Token JwtRefreshTokenStrategy")
+  //   const refreshToken = req
+  //     ?.get('authorization')
+  //     ?.replace('Bearer', '')
+  //     .trim();
+  //   console.log(refreshToken, "Refresh Token JwtRefreshTokenStrategy")
 
-    return {
-      ...payload,
-      refreshToken,
-    };
-  }
+  //   return {
+  //     ...payload,
+  //     refreshToken,
+  //   };
+  // }
 }

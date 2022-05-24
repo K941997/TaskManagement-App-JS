@@ -83,10 +83,12 @@ export class AuthService {
 
   //!Access Token: (For Login)
   public getCookieWithJwtAccessToken(user: any) {
+    console.log("Đang vào AccessToken Service...")
+
     console.log(user, "User AccessToken Service")
 
     const payload = {sub: user.id} //todo: send payload to jwtStrategy
-    console.log(payload, "payload User AccessTokenService")
+    console.log(payload, "payload User AccessToken Service")
     
     const token = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET_KEY,
@@ -98,7 +100,7 @@ export class AuthService {
 
   //!Refresh Token: (For Login)
   public getCookieWithJwtRefreshToken(userId: number) {
-    const payload  = {sub: userId} //todo: send payload to jwtRefreshTokenStrategy
+    const payload  = { userId } //todo: send payload to jwtRefreshTokenStrategy
     console.log(payload, "payload User RefreshToken Service")
     const token = this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_TOKEN_SECRET,
@@ -113,7 +115,7 @@ export class AuthService {
 
   
 
-  //!CurrentRefreshToken Hash: (For Login)
+  //!setCurrentRefreshToken Hash: (For UserEntity For Login)
   async setCurrentRefreshToken(refreshToken: string, userId: number) {
     const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.userRepository.update(userId, {
@@ -125,7 +127,7 @@ export class AuthService {
   //!GetUserIfRFMatches: (For jwtRFStrategy For Refresh)
   async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
 
-    console.log("Đang vào getUserIfRefreshTokenMatches")
+    console.log("Đang vào getUserIfRefreshTokenMatches Service...")
 
     const user = await this.findUserById(userId);
     if (!user) {
@@ -141,6 +143,10 @@ export class AuthService {
     } else {
       console.log("GetUserIfRFMatches ko Match")
     }
+
+    console.log("Đã xong getUserIfRefreshTokenMatches Service...")
+
+   
   }
   
   //!LogOut:

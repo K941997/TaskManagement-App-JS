@@ -72,7 +72,7 @@ export class AuthController {
     } 
     = this.authService.getCookieWithJwtRefreshToken(user.id);
 
-    //CurrentRefreshToken Hash:
+    //!setCurrentRefreshToken Hash:
     await this.authService.setCurrentRefreshToken(refreshToken, user.id)
 
     //Cookie:
@@ -92,6 +92,8 @@ export class AuthController {
   @UseGuards(JwtRefreshTokenGuard)
   @Post('refresh')
   refresh(@Req() request) {
+    console.log("Đang vào Refresh Controller...")
+    
     const user = request.user
     console.log(user, "User in Refresh Controller")
 
