@@ -38,14 +38,13 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
   }
  
   //Cách 1:
-
   async validate(request: Request, payload: any) {
     console.log("Đang vào JwtStrategyRefreshToken...")
     
     console.log(payload, "Payload in JwtStrategyRefreshToken")
 
     const refreshToken = request.cookies?.Refresh;
-    console.log(refreshToken, "Refresh Token in Strategy")
+    console.log(refreshToken, "RefreshToken in JwtStrategyRefreshToken")
 
     return this.authService.getUserIfRefreshTokenMatches(refreshToken, payload.userId);
   }

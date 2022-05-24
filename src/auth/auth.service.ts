@@ -126,7 +126,6 @@ export class AuthService {
 
   //!GetUserIfRFMatches: (For jwtRFStrategy For Refresh)
   async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
-
     console.log("Đang vào getUserIfRefreshTokenMatches Service...")
 
     const user = await this.findUserById(userId);
@@ -141,7 +140,7 @@ export class AuthService {
     if (isRefreshTokenMatching) {
       return user;
     } else {
-      console.log("GetUserIfRFMatches ko Match")
+      console.log("RefreshToken Not Matches")
     }
 
     console.log("Đã xong getUserIfRefreshTokenMatches Service...")

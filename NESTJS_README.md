@@ -819,20 +819,30 @@ $ npm install express-session @types/express-session
 
 ##############################SERCURITY###################################
 # (Đã Xong) JWTToken thay cho SessionCookies
+
+# (Đã xong) Refresh JWT Token (Để bảo mật, không phải đăng nhập lại)
+# (Đã Xong) vì unauthorized khi lấy refresh token (Vì chưa cài cookie-parser)
+# (Đã Xong) vì dùng Access Token mới ko Update được, dùng Access Token cũ thì được
+# (Đã Xong) (Vẫn đúng Logic) vì dùng Access Token mới Update được, dùng Access Token cũ vẫn được
+
+# (Đã Xong) LogOut xóa hết các token
+
 # (Đã Xong) Đang gặp lỗi Many To Many tạo 1 Task chứa Categories [1,2,3] 2, 3 không tồn tại -> bị Internal server error
-# (Đã Xong) Nếu nhập API phải để "categoryIds": [] thì mới được rỗng, nếu ko nhập "categoryIds" thì sẽ lỗi 
-# (Đã xong) CASL Role, isAdmin, isCreator
-# (Đã Xong) CASL CRUD Tasks
-# (Đã Xong) CASL CRUD User //!Lỗi update xong bị sai mật khẩu Login do chưa bcrypt
+# (Đã Xong) Nếu nhập API phải để "categoryIds": [] thì mới được rỗng, nếu ko nhập "categoryIds" thì sẽ lỗi
 # (Đã Xong) Relations TypeOrm:
   + JoinColumn() dùng 1 phía  cho OneToOne, ManyToOne (Có thể bỏ qua)
   + JoinTable() dùng 1 phía cho ManyToMany
 # (Đã Xong) Custom Relation ManyToMany CRUD:
   + Create Task + Category bị lỗi Category Not Found
-# (Đã xong) CASL CRUD User: Xóa User Xóa Task, Không Xóa Categories
+
+# (Đã xong) CASL Role, isAdmin, isCreator
+# (Đã Xong) CASL CRUD Tasks
+# (Đã Xong) CASL CRUD User //!Lỗi update xong bị sai mật khẩu Login do chưa bcrypt
+# (Đã xong) CASL CRUD User: Xóa User Xóa Task, Không Xóa Categories (Không để onCascade Delete)
+
 # (Đã xong) Read User By /:username Vì trùng /:id: thay = /username/:username
 # (Đã Xong) Relation OneToOne, Relation ManyToMany change OneToMany + ManyToOne in Tables: "TaskToCategories", "Tasks", "Categories"
-# (Đã xong) LogOut (Frontend làm)
+
 # (Đã Xong) .env trong Migrations
 # (Đã Xong) học DBeaver
 # (Đã xong) CRUD with MongoDB:
@@ -855,14 +865,19 @@ $ npm install express-session @types/express-session
 # (Chưa Xong) HTTP Module (Axios)
 # (Chưa Xong) Server Sent Event (Real-time 1 chiều Đồ thị, News Feed khác WebSockets Real-time 2 chiều Chat Online, Game)
 ##############################OTHERS###################################
-# (Chưa xong) Pagination Infinite Scroll (Phân trang)
-# (Chưa Xong) Offset Pagination (Phân trang)
-# (Chưa xong) Refresh JWT Token
+# (Đã Xong) Pagination Infinite Scroll (Phân trang) (Không dùng)
+# (Đã xong) Get All Tasks + Pagination (Phân trang)
+# (Đã xong) Paginate + Search FilterByTitle (Phân trang + Tìm kiếm Tasks theo Title)
+# (Đã xong) Tại sao Search Interface lại Search được DB (Trong Logic có lấy từ Repository)
+# (Chưa xong) Search "ba" vẫn tìm thấy "bá" (Dùng ElasticSearch)
+# (Chưa Xong) ElasticSearch (+ Docker)
+# (Chưa xong) Comment
+
 # (Chưa Xong) Verify Link Nodemailer
 # (Chưa Xong) Verify Phone Sendgrid Twilio
 # (Chưa Xong) Email Google Authent
 # (Chưa Xong) Transactions (Giao dịch)
-# (Chưa Xong) Elastic Search (+ Docker)
+
 # (Chưa Xong) Unit Test, E2E
 # (Chưa Xong) GraphQL
 # (Chưa Xong) TypeScript
@@ -966,10 +981,6 @@ $ npm install express-session @types/express-session
       max: 100, //maximum number of items in Cache
     }),
 
-
-
-
-
 ##############################SERCURITY###################################
 ###### Authentication SignUp SignIn:
 # 1. Session Cookies:
@@ -993,7 +1004,215 @@ $ npm install @nestjs/passport passport @types/passport-local passport-local @ty
 - SignUp (hashPassword) + Verify Password: LocalStrategy + ValidateUser: LocalStrategy + LocalStrategy + LocalGuard('local' dán vào Controller SignIn)
 - SignIn loginPayloadJWTToken + JWTStrategy + JWTGuard dán vào Controller cần JWTGuard
 
-##### Authorization Role:
+
+###### Refresh JWT Token (Để bảo mật, không phải đăng nhập lại):
+- Đăng nhập sẽ lưu Access Token + Refresh Token ở Cookie HTTP Only = true
+- Đăng nhập sẽ lưu CurrentHashRefreshToken ở UserEntity Database
+- Login A tạo ra các token, Login B thì CurrentHashRefreshToken của A sẽ giữ nguyên cho đến khi Login A lại
+- Logout sẽ xóa các token đi
+
+- thêm vào .env:
+  JWT_REFRESH_TOKEN_SECRET = refreshTokenKey
+  JWT_REFRESH_TOKEN_EXPIRES_IN = 864000s
+
+- auth.entity:
+  @Column({
+    nullable: true
+  })
+  @Exclude()
+  public currentHashedRefreshToken?: string;
+
+- auth.service:
+  //!Access Token: (For Login)
+  public getCookieWithJwtAccessToken(user: any) {
+    console.log("Đang vào AccessToken Service...")
+
+    console.log(user, "User AccessToken Service")
+
+    const payload = {sub: user.id} //todo: send payload to jwtStrategy
+    console.log(payload, "payload User AccessToken Service")
+    
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET_KEY,
+      expiresIn: process.env.JWT_TIME_EXPIRES_IN
+    });
+    return `Authentication = ${token}; HttpOnly; Path = /; Max-Age = ${process.env.JWT_TIME_EXPIRES_IN}`
+  }
+
+  //!Refresh Token: (For Login)
+  public getCookieWithJwtRefreshToken(userId: number) {
+    const payload  = { userId } //todo: send payload to jwtRefreshTokenStrategy
+    console.log(payload, "payload User RefreshToken Service")
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+      expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
+    });
+    const cookie = `Refresh = ${token}; HttpOnly; Path = /; Max-Age = ${process.env.JWT_REFRESH_TOKEN_EXPIRES_IN}`;
+    return {
+      cookie,
+      token
+    }
+  }
+
+  //!setCurrentRefreshToken Hash: (For UserEntity For Login)
+  async setCurrentRefreshToken(refreshToken: string, userId: number) {
+    const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.userRepository.update(userId, {
+      currentHashedRefreshToken
+    });
+  }
+
+  //!GetUserIfRFMatches: (For jwtRFStrategy For Refresh)
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+    console.log("Đang vào getUserIfRefreshTokenMatches Service...")
+
+    const user = await this.findUserById(userId);
+    if (!user) {
+      console.log("Ko tìm thấy user")
+    }
+ 
+    const isRefreshTokenMatching = await bcrypt.compare(
+      refreshToken,
+      user.currentHashedRefreshToken
+    );
+    if (isRefreshTokenMatching) {
+      return user;
+    } else {
+      console.log("RefreshToken Not Matches")
+    }
+    console.log("Đã xong getUserIfRefreshTokenMatches Service...")
+  }
+
+- auth.controller:
+  //!SignIn:
+  //todo: SignIn save (AccessToken, RefreshToken in Cookie) (CurrentRefreshToken in Database)
+  @HttpCode(200)
+  @UseGuards(LocalAuthGuard) //!LocalStrategy Xác thực người dùng
+  @Post('/signin')
+  async signIn(@Request() req: RequestWithUser){ //!req lấy thông tin từ LocalAuthGuard
+    const user = req.user;
+    user.password = undefined;
+
+    //!Access Token:
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(user) 
+
+    //!Refresh Token:
+    const { 
+      cookie: refreshTokenCookie, 
+      token: refreshToken 
+    } 
+    = this.authService.getCookieWithJwtRefreshToken(user.id);
+
+    //!setCurrentRefreshToken Hash:
+    await this.authService.setCurrentRefreshToken(refreshToken, user.id)
+
+    //Cookie:
+    req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
+
+    //Return:
+    return {
+      ...user,
+      accessTokenCookie, 
+      refreshTokenCookie
+    }
+
+  }
+
+- jwtRefreshToken.strategy:
+  //!JwtRefreshToken: (For Refresh)
+  @Injectable()
+  export class JwtRefreshTokenStrategy extends PassportStrategy(
+    Strategy,
+    'jwt-refresh-token'
+  ) {
+    constructor(
+      private readonly authService: AuthService,
+      @InjectRepository(UserRepository) //!@InjectRepository: đưa UserRepository vào Service
+      private userRepository: UserRepository, //!private: vừa khai báo vừa injected vừa khởi tạo
+    ) {
+      super({
+        jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
+          return request?.cookies?.Refresh;
+        }]),
+        secretOrKey: process.env.JWT_REFRESH_TOKEN_SECRET,
+        passReqToCallback: true,
+
+      });
+    }
+  
+    async validate(request: Request, payload: any) {
+      console.log("Đang vào JwtStrategyRefreshToken...")
+      console.log(payload, "Payload in JwtStrategyRefreshToken")
+
+      const refreshToken = request.cookies?.Refresh;
+      console.log(refreshToken, "RefreshToken in JwtStrategyRefreshToken")
+
+      return this.authService.getUserIfRefreshTokenMatches(refreshToken, payload.userId);
+    }
+
+- jwtRefreshToken.guard:
+  @Injectable()
+  export default class JwtRefreshGuard extends AuthGuard('jwt-refresh-token') {}
+  
+- auth.controller:
+  //!Refresh:
+  @UseGuards(JwtRefreshTokenGuard)
+  @Post('refresh')
+  refresh(@Req() request) {
+    console.log("Đang vào Refresh Controller...")
+    
+    const user = request.user
+    console.log(user, "User in Refresh Controller")
+
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(user);
+ 
+    request.res.setHeader('Set-Cookie', accessTokenCookie);
+    return user;
+  }
+
+###### LogOut: (Xóa hết các token)
+- auth.service:
+  //!LogOut:  
+  public getCookiesForLogOut() {
+    return [
+      'Authentication=; HttpOnly; Path=/; Max-Age=0',
+      'Refresh=; HttpOnly; Path=/; Max-Age=0'
+    ];
+  }
+
+  //!RemoveRefreshTokenWhenLogOut: (For LogOut)
+  async removeRefreshToken(user:any) {
+    return this.userRepository.update(user, {
+      currentHashedRefreshToken: null
+    });
+  }
+
+- auth.controller:
+  //!LogOut:
+  //todo: LogOut = Access Token -> CurrentRefreshToken = Null
+  @UseGuards(JwtAuthGuard)
+  @Post('signout')
+  @HttpCode(200)
+  async logOut(@Req() request: RequestWithUser) {
+    await this.authService.removeRefreshToken(request.user.id);
+    request.res.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
+  }
+
+  
+
+# (Đã Xong) vì unauthorized khi lấy refresh token (Vì chưa cài cookie-parser)
+# (Đã Xong) vì dùng Access Token mới ko Update được, dùng Access Token cũ thì được
+# (Đã Xong) (Vẫn đúng Logic) vì dùng Access Token mới Update được, dùng Access Token cũ vẫn được
+
+
+
+
+
+
+
+
+
+###### Authorization Role CASL:
 # 1. Role User Admin (RBAC):
 - role.enum.ts
 - role.decorator.ts
@@ -1055,10 +1274,50 @@ $ npm install @nestjs/passport passport @types/passport-local passport-local @ty
     @CheckPolicies((ability: AppAbility) => ability.can(Action.Delete, TaskEntity))
 
 
-##### Helmet:
+###### Helmet:
 - Đặt tiêu đề HTTP để bảo mật
 - $ npm i --save helmet
 - ts.config.json: 
+
+
+
+##############################OTHERS###################################
+###### Pagination Infinite Scroll (Không dùng):
+###### Get All Tasks + Pagination: (Xem nốt)
+$ npm i nestjs-typeorm-paginate
+(Nếu ko cài được thì chạy cái này trước) $ npm config set legacy-peer-deps true
+- task:
+  + task.service:
+    import {
+      paginate,
+      Pagination,
+      IPaginationOptions,
+    } from 'nestjs-typeorm-paginate';
+    ...
+    async paginate(options: IPaginationOptions): Promise<Pagination<TaskEntity>> {
+      const queryBuilder = this.taskRepository.createQueryBuilder('task');
+      queryBuilder.orderBy('task.createdAt', 'DESC'); //todo: Mới nhất đến cũ nhất
+
+      return paginate<TaskEntity>(queryBuilder, options);
+    }
+  + task.controller:
+    @Get()
+    index(
+      @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+      @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    ): Promise<Pagination<TaskEntity>> {
+      limit = limit > 100 ? 100 : limit;
+      return this.tasksService.paginate({
+        page,
+        limit,
+        route: 'http://localhost:3000/api/tasks',
+      });
+    }
+
+###### Search FilterByTitle + Pagination: (Xem nốt)
+- tasks:
+  + tasks.service
+  + tasks.controller
   
 
 ###### DBeaver hỗ trợ PostgreSQL:
