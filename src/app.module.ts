@@ -16,6 +16,7 @@ import { MongooseModule } from '@nestjs/mongoose'; //MongoDB
 import { CategoriesMongoDbModule } from './categories-mongo-db/categories-mongo-db.module';
 import { RedisCacheModule } from './cacheRedis/redis.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -61,6 +62,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     //   // max: 100, //maximum number of items in Cache
     //   isGlobal: true,
     // }),
+
+    ScheduleModule.forRoot(),
   
   ],
   controllers: [AppController],
