@@ -56,7 +56,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     //.env CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?
     
   
-    // RedisCacheModule, //!Redis Cache: (+ Docker)
+    // RedisCacheModule, //!Cache Redis: (+ Docker)
     // CacheModule.register({ //!Cache Global
     //   // ttl: 60, //thời gian hết hạn của bộ nhớ Cache
     //   // max: 100, //maximum number of items in Cache

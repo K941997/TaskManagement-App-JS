@@ -50,7 +50,7 @@ import { Pagination } from 'nestjs-typeorm-paginate';
 import { from, Observable } from 'rxjs';
 import { TaskInterface } from './entity/task.interface';
 @Controller('tasks') //localhost:3000/api/tasks/
-@UseInterceptors(ClassSerializerInterceptor) //!In-memory Cache:
+@UseInterceptors(CacheInterceptor) //!Cache In-memory:
 export class TasksController {
   constructor(
     private tasksService: TasksService,

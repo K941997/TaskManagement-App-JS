@@ -12,14 +12,17 @@ import { AuditMiddleware } from 'src/middlewares/audit.middleware';
 @Module({
   imports: [
     TypeOrmModule.forFeature([TaskRepository]),
+
     AuthModule,
 
     CaslModule, //!CASL Role
 
     RedisCacheModule, //!Redis Cache
-    CacheModule.register({ //!In-memory Cache | Cache Manually:
+
+    CacheModule.register({ //!Cache In-memory | Cache Manually:
       ttl: 10, //thời gian hết hạn của bộ nhớ Cache, sau khi xóa sẽ cập nhật danh sách sau 10s
       max: 100, //maximum number of items in Cache
+      // isGlobal: true, //Global
     }),
   ],
   providers: [TasksService],
