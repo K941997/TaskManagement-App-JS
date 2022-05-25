@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@casl/ability": "^5.4.3",
+    "@nestjs/bull": "^0.5.5",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.0.0",
     "@nestjs/core": "^8.0.0",
@@ -40,6 +41,7 @@
     "@types/passport-jwt": "^3.0.6",
     "@types/passport-local": "^1.0.34",
     "bcrypt": "^5.0.1",
+    "bull": "^4.8.3",
     "cache-manager": "^3.6.1",
     "cache-manager-redis-store": "^2.0.0",
     "class-transformer": "^0.5.1",
@@ -69,6 +71,7 @@
     "@nestjs/cli": "^8.0.0",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.0.0",
+    "@types/bull": "^3.15.8",
     "@types/cache-manager": "^3.4.3",
     "@types/cookie-parser": "^1.4.3",
     "@types/cron": "^2.0.0",
