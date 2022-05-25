@@ -25,7 +25,7 @@ import { FileConsumer } from './fileQueues/file.consumer';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ 
+    ConfigModule.forRoot({  //!.env Global
       isGlobal: true,
     }),
 
