@@ -17,7 +17,7 @@ import { AuditMiddleware } from 'src/middlewares/audit.middleware';
 
     CaslModule, //!CASL Role
 
-    RedisCacheModule, //!Redis Cache
+    RedisCacheModule, //!Cache Redis
 
     CacheModule.register({ //!Cache In-memory | Cache Manually:
       ttl: 10, //thời gian hết hạn của bộ nhớ Cache, sau khi xóa sẽ cập nhật danh sách sau 10s

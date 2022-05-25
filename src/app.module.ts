@@ -17,6 +17,11 @@ import { CategoriesMongoDbModule } from './categories-mongo-db/categories-mongo-
 import { RedisCacheModule } from './cacheRedis/redis.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BullModule } from '@nestjs/bull';
+import { MessageProducerService } from './messageQueues/message.producer.service';
+import { MessageConsumer } from './messageQueues/message.consumer';
+import { FileProducerService } from './fileQueues/file.producer.service';
+import { FileConsumer } from './fileQueues/file.consumer';
 
 @Module({
   imports: [
@@ -27,11 +32,14 @@ import { ScheduleModule } from '@nestjs/schedule';
     TypeOrmModule.forRoot(), //!TypeOrm PostgreSQL Database
 
     AuthModule,
-    TasksModule,
+
+    TasksModule, //!TasksModule Chứa cả Cache (Nếu Cache bắt buộc ở AppModule thì ko được cho vào TasksModule)
+
     CategoriesModule,
+
     // CategoriesMongoDbModule,
 
-    PassportModule.register({ //!Session Cookie PassportJS
+    PassportModule.register({ //!SessionCookie PassportJS
       session: true,
     }),
 
@@ -55,20 +63,30 @@ import { ScheduleModule } from '@nestjs/schedule';
     // }), UserTypesModule //!MongoDB Database
     //.env CONNECT_MONGODB = mongodb+srv://Kay941997:password@taskmanagement.drrox.mongodb.net/myFirstDatabase?
     
-  
-    // RedisCacheModule, //!Cache Redis: (+ Docker)
-    // CacheModule.register({ //!Cache Global
-    //   // ttl: 60, //thời gian hết hạn của bộ nhớ Cache
-    //   // max: 100, //maximum number of items in Cache
-    //   isGlobal: true,
-    // }),
+    ScheduleModule.forRoot(), //!Task Scheduling
 
-    ScheduleModule.forRoot(),
+    BullModule.forRoot({ //!Queues Bull.forRoot (phải ở AppModule)
+      redis: {  //Redis
+        host: 'localhost',
+        port: 6379
+      }
+    }),
+
+    BullModule.registerQueue({ //!Queues Bull.registerQueue
+      name: 'message-queue' //todo: MessageProducerService
+    }, {
+      name: 'file-operation' //todo: FileProducerService
+    }),
+
   
   ],
   controllers: [AppController],
   providers: [
     AppService,
+    MessageProducerService, //!MessageProducerService Queues Bull
+    MessageConsumer, //!MessageConsumer Queues Bull
+    FileProducerService, //!FileProducerService Queues Bull
+    FileConsumer,  //!FileConsumer Queues Bull
   ],
 })
 export class AppModule {}

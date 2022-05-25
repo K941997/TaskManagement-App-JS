@@ -50,6 +50,7 @@
     "cookie-session": "^2.0.0",
     "dotenv": "^16.0.0",
     "express-session": "^1.17.2",
+    "fs": "^0.0.1-security",
     "helmet": "^5.0.2",
     "install": "^0.13.0",
     "jwt-refresh-token": "^0.0.4",

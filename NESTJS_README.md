@@ -856,9 +856,13 @@ $ npm install express-session @types/express-session
 ##############################TECHNIQUES###################################
 # (Đã xong) Redis
 # (Đã xong) Cache In-memory, Cache Manually, Cache Redis (Vote In-memory + Redis, Cache dùng ở Controller)
-# (Chưa xong) Serialization (Tạo Custom, Exclude-Trả về Loại bỏ hiển thị, Expose-Trả về Phơi bày, Transform, SerializeOptions)
+# (Chưa xong) Serialization (Tạo Custom, Entity: @Exclude-Trả về Loại bỏ hiển thị, @Expose-Trả về Phơi bày, Transform, SerializeOptions() in Controller)
 # (Chưa Xong) Versioning (for Microservice)
-# (Chưa Xong) Task Scheduling, Queues, Events. (Dùng để gửi mail chúc mừng sinh nhật khách)
+# (Đã Xong) Task Scheduling
+# (Chưa Xong) Queues
+# (Chưa Xong) Logging
+# (Chưa Xong) Cookies
+# (Chưa Xong) Events. (Dùng để gửi mail chúc mừng sinh nhật khách)
 # (Chưa Xong) Cookie-parser
 # (Chưa Xong) Compression (Nén để tăng tốc độ ứng dụng)
 # (Chưa Xong) Upload file
@@ -922,7 +926,6 @@ $ npm install express-session @types/express-session
     ttl: 5, //thời gian hết hạn của bộ nhớ Cache
     max: 100, //maximum number of items in Cache
   })
-
 # a. Cache In-memory (No Global): (Vote dùng + Cache Redis)
 - task.controller, category.controller, user.controller:
   @Controller('tasks')
@@ -933,7 +936,6 @@ $ npm install express-session @types/express-session
   @UseInterceptors(CacheInterceptor) //!In-memory Cache:
   ...
   }
-
 # b. Cache Manually (No Global): (Tăng hiệu suất)
 - task.service:
   constructor: {
@@ -941,10 +943,9 @@ $ npm install express-session @types/express-session
     @Inject(CACHE_MANAGER) //!Cache Manually: 
     private cacheManager: Cache
   }
-
-# invalidating Cache:
-- create folder cacheManually
-- task.service:
+- invalidating Cache:
++ create folder cacheManually
++ task.service:
   + clearCache(): dùng cho Create Update Delete
   async clearCache() {
     const keys: string[] = await this.cacheManager.store.keys();
@@ -954,32 +955,235 @@ $ npm install express-session @types/express-session
       }
     })
   }
-
   ...
   + Create Update Delete:
   async createTask () {
     ...
      await this.clearCache(); //Cache Manually
   } 
- 
 - task.controller:
   @Get()
   @UseInterceptors(CacheInterceptor) //!In-memory Cache | Cache Manually:
   @CacheKey(GET_CACHE_KEY) //!Cache Manually
   @CacheTTL(120) //!Cache Manually
- 
-
 # c. Cache Redis (Vote dùng + Cache In-memory):
 - Cài Redis
 - create folder cacheRedis:
   + redis.module
   + redis.service
 - task.module:
-    RedisCacheModule, //!Redis Cache: (+ Docker)
+    RedisCacheModule, //!Redis Cache
     CacheModule.register({ //!In-memory Cache | Cache Manually:
       ttl: 10, //thời gian hết hạn của bộ nhớ Cache, sau khi xóa sẽ cập nhật danh sách sau 10s
       max: 100, //maximum number of items in Cache
     }),
+
+###### Task Scheduling: (Lập lịch tác vụ)
+$ npm install --save @nestjs/schedule
+$ npm install --save-dev @types/cron
+- app.module:
+  imports: [ScheduleModule.forRoot()],
+- app.service:
+  constructor(private schedulerRegistry: SchedulerRegistry) {}
+
+  //!Task Scheduling:
+  //todo: Declarative cron jobs:
+  @Cron('* * * * * *') 
+  triggerCronJob(){
+    // console.log("CronJob in Task Scheduling")
+  }
+
+  @Cron(CronExpression.EVERY_5_SECONDS)
+  triggerCronJobExpression(){
+    // console.log("CronJob Expression in Task Scheduling")
+  }
+
+  @Cron('4 * * * * *', {
+    name: 'messaging',
+    timeZone: 'America/New_York'
+  })
+  triggerCronJobOptions(){
+    // console.log("CronJob Options in Task Scheduling")
+  }
+
+  //todo: Declarative intervals:
+  @Interval(2000)
+  triggerCronJobInterval(){
+    // console.log("CronJob Interval in Task Scheduling")
+  }
+
+  @Interval('messaging', 3500)
+  triggerCronJobIntervalOptions(){
+    // console.log("CronJob Interval Options in Task Scheduling")
+  }
+
+  //todo: Declarative timeouts:
+  @Timeout(3000)
+  handleTimeout() {
+    // console.log("Calling once after timeout of 3s")
+  }
+
+  @Timeout('messaging', 3500)
+  handleNamedTimeout(){
+    // console.log("Calling once after 3.5s based on named timeout")
+  }
+  
+
+  //todo: Dynamic cron jobs:
+  private readonly logger = new Logger(AuthService.name);
+  
+  @Cron('* * * * * *', {
+    name: 'notifications',
+  })
+
+  triggerNotificationsDynamicCronJob(){
+    // const job = this.schedulerRegistry.getCronJob('notifications');
+    // job.stop();
+    // // job.start();
+    // console.log(job.lastDate())
+  }
+
+  addCronJob(name: string, seconds: string){
+    // const job = new CronJob(`${seconds} * * * * *`, () => {
+    //   this.logger.warn(`time (${seconds}) for job ${name} to run!`);
+    // });
+    
+    // this.schedulerRegistry.addCronJob(name, job);
+    // job.start();
+
+    // this.logger.warn(
+    //   `job ${name} added for each minute at ${seconds} seconds!`,
+    // )
+  }
+
+  deleteCron(name: string) {
+    // this.schedulerRegistry.deleteCronJob(name);
+    // this.logger.warn(`job ${name} deleted!`);
+  }
+
+  getCrons() {
+    // const jobs = this.schedulerRegistry.getCronJobs();
+    // jobs.forEach((value, key, map) => {
+    //   let next;
+    //   try {
+    //     next = value.nextDates().toJSDate();
+    //   } catch (e) {
+    //     next = 'error: next fire date is in the past!';
+    //   }
+    //   this.logger.log(`job: ${key} -> next: ${next}`);
+    // });
+  }
+
+  //todo: Dynamic intervals:
+  triggerNotificationsDynamicIntervals(){
+    // const interval = this.schedulerRegistry.getInterval('notifications');
+    // clearInterval(interval);
+  }
+  
+
+  addInterval(name: string, milliseconds: number) {
+    // const callback = () => {
+    //   this.logger.warn(`Interval ${name} executing at time (${milliseconds})!`);
+    // };
+  
+    // const interval = setInterval(callback, milliseconds);
+    // this.schedulerRegistry.addInterval(name, interval);
+  }
+
+  deleteInterval(name: string) {
+    // this.schedulerRegistry.deleteInterval(name);
+    // this.logger.warn(`Interval ${name} deleted!`);
+  }
+
+  getIntervals() {
+    // const intervals = this.schedulerRegistry.getIntervals();
+    // intervals.forEach(key => this.logger.log(`Interval: ${key}`));
+  }
+
+  
+  //todo: Dynamic timeouts:
+  triggerNotificationsDynamicTimeout(){
+    // const timeout = this.schedulerRegistry.getTimeout('notifications');
+    // clearTimeout(timeout);
+  }
+
+  addTimeout(name: string, milliseconds: number) {
+    // const callback = () => {
+    //   this.logger.warn(`Timeout ${name} executing after (${milliseconds})!`);
+    // };
+  
+    // const timeout = setTimeout(callback, milliseconds);
+    // this.schedulerRegistry.addTimeout(name, timeout);
+  }
+
+  deleteTimeout(name: string) {
+    // this.schedulerRegistry.deleteTimeout(name);
+    // this.logger.warn(`Timeout ${name} deleted!`);
+  }
+  
+  getTimeouts() {
+    // const timeouts = this.schedulerRegistry.getTimeouts();
+    // timeouts.forEach(key => this.logger.log(`Timeout: ${key}`));
+  }
+
+
+###### Queues: (Phải ở App.Module)
+- Xử lý mượt mà, tăng hiệu suất ứng dụng
+$ npm install --save @nestjs/bull bull
+$ npm install --save-dev @types/bull
+
+- app.module:
+  BullModule.forRoot({ //!Queues Bull.forRoot (phải ở AppModule)
+    redis: {  //Redis
+      host: 'localhost',
+      port: 6379
+    }
+  }),
+
+  BullModule.registerQueue({ //!Queues Bull.registerQueue
+    name: 'message-queue' //todo: MessageProducerService
+  }, {
+    name: 'file-operation' //todo: FileProducerService
+  }),
+
+  ...
+  providers: [
+    AppService,
+    MessageProducerService, //!MessageProducerService Queues Bull
+    MessageConsumer, //!MessageConsumer Queues Bull
+    FileProducerService, //!FileProducerService Queues Bull
+    FileConsumer,  //!FileConsumer Queues Bull
+  ],
+
+- message.producer.service.ts: (file.producer.service.ts tương tự)
+  @Injectable()
+  export class MessageProducerService{ //!MessageProducerService Queues Bull
+      constructor(@InjectQueue('message-queue') private queue: Queue) {
+      }
+
+      async sendMessage(msg: string) {
+          await this.queue.add('message-job', {
+              text: msg
+          }, {delay: 5000})
+      }
+  }
+
+- message.consumer.ts: (Logic) (file.consumer.ts tương tự)
+  @Processor('message-queue')
+  export class MessageConsumer{ //!MessageConsumer Queues Bull
+      @Process('message-job')
+      messageJob(job: Job<unknown>){
+          console.log(`${job.data} MessageConsumer`);
+      }
+  }
+
+- app.controller:
+  @Get('send-message') //!MessageProducerService Queues Bull
+  async sendMessage(@Query('msg') msg: string) {
+    this.messageProducerService.sendMessage(msg);
+    return `${msg} AppController`;
+  }
+
 
 ##############################SERCURITY###################################
 ###### Authentication SignUp SignIn:
