@@ -22,6 +22,8 @@ import { MessageProducerService } from './messageQueues/message.producer.service
 import { MessageConsumer } from './messageQueues/message.consumer';
 import { FileProducerService } from './fileQueues/file.producer.service';
 import { FileConsumer } from './fileQueues/file.consumer';
+import { FirebaseAuthStrategy } from './firebase/firebase-auth.strategy';
+import { ResourcesModule } from './firebase/resources/resources.module';
 
 @Module({
   imports: [
@@ -78,15 +80,20 @@ import { FileConsumer } from './fileQueues/file.consumer';
       name: 'file-operation' //todo: FileProducerService
     }),
 
+    ResourcesModule, //!Test FE Firebase
+
   
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    MessageProducerService, //!MessageProducerService Queues Bull
-    MessageConsumer, //!MessageConsumer Queues Bull
-    FileProducerService, //!FileProducerService Queues Bull
-    FileConsumer,  //!FileConsumer Queues Bull
+    
+    MessageProducerService, //!Queues Bull
+    MessageConsumer, //!Queues Bull
+    FileProducerService, //!Queues Bull
+    FileConsumer,  //!Queues Bull
+
+    FirebaseAuthStrategy, //!Firebase
   ],
 })
 export class AppModule {}

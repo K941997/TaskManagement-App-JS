@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable prettier/prettier */
 import {
   Body,
@@ -18,7 +19,8 @@ import {
   Delete,
   Patch,
   ClassSerializerInterceptor,
-  UseInterceptors
+  UseInterceptors,
+  BadGatewayException
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/authCredentials.dto';
@@ -37,6 +39,27 @@ import { UserEntity } from './entity/user.entity';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import JwtRefreshGuard from './utils/guard/jwtRefreshTokenGuard.guard';
 import JwtRefreshTokenGuard from './utils/guard/jwtRefreshTokenGuard.guard';
+import { UserDtoFirebase } from './dto/userDtoFirebase.dto';
+import { FirebaseAuthGuard } from 'src/firebase/firebase-auth.guard';
+
+import * as firebase from 'firebase/app';
+import * as auth from 'firebase/auth';
+
+// const firebase_params = {
+//   type: process.env.FIREBASE_TYPE,
+//   projectId: process.env.FIREBASE_PROJECT_ID,
+//   privateKeyId: process.env.FIREBASE_PRIVATE_KEY_ID,
+//   privateKey: process.env.FIREBASE_PRIVATE_KEY,
+//   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+//   clientId: process.env.FIREBASE_CLIENT_ID,
+//   authUri: process.env.FIREBASE_AUTH_URI,
+//   tokenUri: process.env.FIREBASE_TOKEN_URI,
+//   authProviderX509CertUrl: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+//   clientC509CertUrl: process.env.FIREBASE_CLIENT_X509_CERT_URL,
+// };
+
+// firebase.initializeApp(firebase_params);
+// auth.initializeAuth(firebase.getApp());
 
 @Controller('auth') //localhost:3000/api/auth
 @UseInterceptors(ClassSerializerInterceptor) //!Serialize (trả về nhưng ko hiển thị @Exclude Entity)
@@ -45,13 +68,30 @@ export class AuthController {
     private readonly authService: AuthService, //!private: vừa khai báo vừa injected vừa khởi tạo
     private caslAbilityFactory: CaslAbilityFactory) {}
 
-  //!Sign Up:
+  //!SignUp:
   @Post('/signup')
   @UsePipes(ValidationPipe) //có hoặc không vì đã có Global Validation
   signUp(@Body() authCreadentialsDto: AuthCredentialsDto) {
     return this.authService.signUp(authCreadentialsDto);
   }
 
+  // //!SignUp Firebase:
+  // @Post('/signupfirebase')
+  // signUpFirebase(@Body() body) {
+  //   const {email, password} = body;
+  //   console.log(email, password);
+
+  //   auth
+  //     .createUserWithEmailAndPassword(auth.getAuth(), email, password)
+  //     .then(async (user) => {
+  //       return user;
+  //     })
+  //     .catch((err: any) => {
+  //       throw new BadGatewayException(err);
+  //     })
+  // }
+
+ 
 
   //!SignIn:
   //todo: SignIn save (AccessToken, RefreshToken in Cookie) (CurrentRefreshToken in Database)

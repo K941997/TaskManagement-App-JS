@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Delete, Get, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Query, Render } from '@nestjs/common';
 import { AppService } from './app.service';
 import { FileProducerService } from './fileQueues/file.producer.service';
 import { MessageProducerService } from './messageQueues/message.producer.service';
@@ -17,15 +17,33 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('send-message') //!MessageProducerService Queues Bull
+  //!MessageProducerService Queues Bull:
+  @Get('send-message') 
   async sendMessage(@Query('msg') msg: string) {
     this.messageProducerService.sendMessage(msg);
     return `${msg} AppController`;
   }
 
-  @Delete('delete-file-name') //!FileProducerService Queues Bull
+  //!FileProducerService Queues Bull:
+  @Delete('delete-file-name') 
   async deleteFileName(@Query('fileName') fileName: string) {
     await this.fileProducerService.deleteFileName(fileName);
     return `${fileName} was deleted AppController`;
   }
+
+
+  //!Test Frontend Firebase:
+  @Get('login')
+  @Render('login')
+  login(){
+    return;
+  }
+
+  @Get('signup')
+  @Render('signup')
+  signup(){
+    return;
+  }
+
+
 }

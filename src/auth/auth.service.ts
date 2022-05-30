@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -17,6 +18,7 @@ import { Action } from 'src/casl/casl-action.enum';
 import * as dotenv from 'dotenv';
 import { TokenPayload } from './interface/tokenPayload.interface';
 dotenv.config()
+
 
 @Injectable() //!@Injectable: injected Service to Controller
 export class AuthService {
@@ -81,7 +83,7 @@ export class AuthService {
   }
 
 
-  //!Access Token: (For Login)
+  //!Access Token: (For Login + CRUD)
   public getCookieWithJwtAccessToken(user: any) {
     console.log("Đang vào AccessToken Service...")
 
@@ -112,7 +114,6 @@ export class AuthService {
       token
     }
   }
-
   
 
   //!setCurrentRefreshToken Hash: (For UserEntity For Login)

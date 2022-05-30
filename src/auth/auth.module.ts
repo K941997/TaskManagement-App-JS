@@ -18,6 +18,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as dotenv from 'dotenv';
 import { JwtRefreshTokenStrategy } from './utils/strategy/jwtRefreshTokenStrategy.strategy';
 import JwtRefreshTokenGuard from './utils/guard/jwtRefreshTokenGuard.guard';
+import FirebaseJwtStrategy from 'passport-firebase-jwt/dist/strategy';
 dotenv.config()
 
 // const passportModule = PassportModule.register({ defaultStrategy: 'jwt' });
@@ -44,10 +45,17 @@ dotenv.config()
 
     CaslModule,
    
+    
   ],
 
   // providers: [AuthService, JwtStrategy, LocalStrategy, SessionCookieSerializer], //!SessionCookies
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtAuthGuard, RolesGuard, JwtRefreshTokenStrategy, JwtRefreshTokenGuard], //!JWT Remove SessionCookies, RolesGuard RBAC not CASL
+  providers: [
+    AuthService, 
+    LocalStrategy,
+    JwtStrategy, JwtAuthGuard,
+    RolesGuard,
+    JwtRefreshTokenStrategy, JwtRefreshTokenGuard,
+  ], //!JWT Remove SessionCookies, RolesGuard RBAC not CASL
 
   controllers: [AuthController],
 

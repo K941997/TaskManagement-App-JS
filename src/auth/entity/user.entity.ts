@@ -22,20 +22,26 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({nullable: true}) //!Firebase Login FB, Gmail:
+  firId: string;
+
   @Column({nullable: true}) //!Vì signUp signIn chỉ lấy DTO username password nên UserEntity phải nullable:true
   name: string;
 
   // @Column({nullable: true}) //!Vì signUp signIn chỉ lấy DTO username password nên UserEntity phải nullable:true
   // address: string;
 
-  @Column({type: 'enum', enum: Role, default: Role.USER}) //!Bỏ, thay = CASL
+  @Column({type: 'enum', enum: Role, default: Role.USER}) //!CASL
   role: Role
 
-  @Column({nullable: true}) //!CASL Role + isCreator thay cho role
+  @Column({nullable: true}) //!CASL
   isAdmin: boolean;
 
   @Column()
   username: string;
+
+  @Column({nullable: true})
+  email: string; //test Firebase
 
   @Column()
   password: string;
