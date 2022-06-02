@@ -58,7 +58,7 @@ export class TasksService {
   //!Create A Task + Relation Database (author + categories):
   async createTask(createTaskDto: CreateTaskDto, author: UserEntity): Promise<TaskEntity> {
 
-    const { title, description, categoryIds } = createTaskDto;
+    const { title, description, categoryIds } = createTaskDto; //todo: dto
     // const taskNew = new TaskEntity();
     // taskNew.title = title;
     // taskNew.description = description;
@@ -66,16 +66,17 @@ export class TasksService {
     // taskNew.author = author;
     // taskNew.taskToCategory = [] ; //todo: ManyToMany Advanced Relation Xem lai
 
-    const task = this.taskRepository.create(
+    const task = this.taskRepository.create( //todo: Repo.create dto
       createTaskDto
     )
 
-    task.author = author
-    task.taskToCategories = []; //Tạo Task chứa Categories rỗng:
-    const newTask = await task.save();
+    task.author = author  //todo: Relation OneToMany
+    task.taskToCategories = []; //Tạo Task chứa Categories rỗng: //todo: Relation ManyToMany
+
+    const newTask = await task.save(); //todo: Repo.save
 
 
-    //todo: Tạo 2 categories giống nhau, trả về 1 category:
+    //todo: Tạo Task có 2 categories giống nhau, trả về 1 category:
     const arr = [];
     for(let i = 0; i<categoryIds.length; i++){
       if(arr.indexOf(categoryIds[i]) === -1)
@@ -83,7 +84,7 @@ export class TasksService {
     }
     console.log(arr)
     
-    //Tạo Task chứa Categories có giá trị:
+    //todo: Tạo Task chứa Categories có giá trị:
     for (let i = 0; i < arr.length; i++) {
       const category = await getRepository(CategoryEntity).findOne(arr[i]);
 
@@ -220,30 +221,39 @@ export class TasksService {
         .setMessage('only admin or creator!')
         .throwUnlessCan(Action.Update, taskToUpdate);
 
+    //todo: Update
     const updatedTask = await this.taskRepository.findOne(id, {relations: ['author']})
 
     const { title, description, categoryIds } = updateTaskDto;
 
-    updatedTask.title = title;
-    updatedTask.description = description;
+    if(!categoryIds){
+      updatedTask.title = title;
+      updatedTask.description = description;
+      await updatedTask.save();
 
-    updatedTask.taskToCategories = [] ; //!ManyToMany Relation Xem lai
-    for (let i = 0; i < categoryIds.length; i++) {
-      const category = await getRepository(CategoryEntity).findOne(categoryIds[i]);
-      console.log(category)
-
-      if (category) {
-        const updateTaskToCategory = new TaskToCategoryEntity();
-        updateTaskToCategory.taskId = updatedTask.id
-        updateTaskToCategory.categoryId = category.id
-
-        updatedTask.taskToCategories.push(updateTaskToCategory);
-      } else {
-        throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
+    } else if (categoryIds) {
+      updatedTask.title = title;
+      updatedTask.description = description;
+      updatedTask.taskToCategories = [] ; //!ManyToMany Relation Xem lai
+  
+      for (let i = 0; i < categoryIds.length; i++) {
+        const category = await getRepository(CategoryEntity).findOne(categoryIds[i]);
+        console.log(category)
+  
+        if (category) {
+          const updateTaskToCategory = new TaskToCategoryEntity();
+          updateTaskToCategory.taskId = updatedTask.id
+          updateTaskToCategory.categoryId = category.id
+  
+          updatedTask.taskToCategories.push(updateTaskToCategory);
+        } else {
+          throw new HttpException('Category Not Found', HttpStatus.NOT_FOUND);
+        }
       }
+  
+      await updatedTask.save();
     }
-
-    await updatedTask.save();
+    
     // await this.clearCache(); //!Cache Manually
     return updatedTask;
   }

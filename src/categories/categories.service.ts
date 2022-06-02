@@ -21,15 +21,15 @@ export class CategoriesService {
 
   //!Create Category:
   async createCategory(category: CreateCategoryDto, user: UserEntity): Promise<CategoryEntity> {
-
     const caslAbility = this.caslAbilityFactory.createForUser(user)
-    const newCategory = await this.categoryRepository.create(category);
+
+    const newCategory = await this.categoryRepository.create(category); //todo: Repo.create dto
 
     try {
       ForbiddenError.from(caslAbility)
       .throwUnlessCan(Action.Create, newCategory);
   
-      await this.categoryRepository.save(newCategory);
+      await this.categoryRepository.save(newCategory); //todo: Repo.save
     } catch (err) {
       if (err.code === '23505') {
         throw new ConflictException(

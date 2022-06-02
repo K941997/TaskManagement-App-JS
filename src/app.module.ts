@@ -74,13 +74,13 @@ import { ResourcesModule } from './firebase/resources/resources.module';
       }
     }),
 
-    BullModule.registerQueue({ //!Queues Bull.registerQueue
+    BullModule.registerQueue({ //!Queues Bull.registerQueue - nâng cao
       name: 'message-queue' //todo: MessageProducerService
     }, {
       name: 'file-operation' //todo: FileProducerService
     }),
 
-    ResourcesModule, //!Test FE Firebase
+    ResourcesModule, //!Test FE Firebase - nâng cao
 
   
   ],
@@ -88,12 +88,12 @@ import { ResourcesModule } from './firebase/resources/resources.module';
   providers: [
     AppService,
     
-    MessageProducerService, //!Queues Bull
-    MessageConsumer, //!Queues Bull
-    FileProducerService, //!Queues Bull
-    FileConsumer,  //!Queues Bull
+    MessageProducerService, //!Queues Bull - nâng cao
+    MessageConsumer, //!Queues Bull - nâng cao
+    FileProducerService, //!Queues Bull - nâng cao
+    FileConsumer,  //!Queues Bull - nâng cao
 
-    FirebaseAuthStrategy, //!Firebase
+    FirebaseAuthStrategy, //!Firebase - nâng cao
   ],
 })
 export class AppModule {}

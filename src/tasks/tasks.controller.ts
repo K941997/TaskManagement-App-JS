@@ -67,7 +67,7 @@ export class TasksController {
   @UsePipes(ValidationPipe)
   async createTask(
     @Body() createTaskDto: CreateTaskDto,
-    @Req() req: RequestWithUser, //!(Req after LogIn) use in createTask
+    @Req() req: RequestWithUser, //todo Task's Author
   ): Promise<TaskEntity> {
     console.log(req.user) //{ id: 1, role: "admin", ... } phục thuộc login trả jwttokenpayload ở AuthService
 
@@ -106,7 +106,7 @@ export class TasksController {
   // @CacheTTL(120) //!Cache Manually
   index(
     @Query('page') page: number = 1, //page * limit = offset
-    @Query('limit') limit: number = 10,
+    @Query('limit') limit: number = 4,
     @Query('title') title: string
   ): Observable<Pagination<TaskInterface>> {
       limit = limit > 100 ? 100 : limit;

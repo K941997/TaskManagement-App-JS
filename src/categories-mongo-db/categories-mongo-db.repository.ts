@@ -7,7 +7,7 @@ import { CreateCategoryMongoDto } from "./dto/createCategoryMongo.dto";
  
 @Injectable()
 export class CategoryMongoRepository {
-    //todo: NoSQL MongoDB phải có Repository riêng để lấy dữ liệu Database:
+    //! NoSQL MongoDB phải có Repository riêng để lấy dữ liệu Database (Khác SQL TypeOrm):
     constructor(
         @InjectModel(CategoryMongoDB.name) //!'Category' from Module
         private categoryModel: Model<CategoryDocument> //!Inject Model MongoDB

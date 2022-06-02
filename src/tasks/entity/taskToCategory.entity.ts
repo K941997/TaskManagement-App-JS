@@ -9,10 +9,10 @@ export class TaskToCategoryEntity {
     @PrimaryGeneratedColumn()
     public taskToCategoryId: number
 
-    @Column()
+    @Column({nullable: true})
     public taskId: number
 
-    @Column()
+    @Column({nullable: true})
     public categoryId: number
     
     @ManyToOne(() => TaskEntity, (task) => task.taskToCategories, {onDelete: "CASCADE"})

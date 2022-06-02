@@ -25,6 +25,7 @@ export class AuthService {
   constructor(
     @InjectRepository(UserRepository) //!@InjectRepository: đưa UserRepository vào Service
     private userRepository: UserRepository, //!private: vừa khai báo vừa injected vừa khởi tạo
+    // private usersRepository: Repository<User>, //! dùng cách này
 
     private jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -33,8 +34,8 @@ export class AuthService {
 
   //!Sign Up:
   async create(userData: AuthCredentialsDto) {
-    const newUser = await this.userRepository.create(userData);
-    await this.userRepository.save(newUser);
+    const newUser = await this.userRepository.create(userData); //todo: Repo.create dto
+    await this.userRepository.save(newUser); //todo: Repo.save
     return newUser;
   }
 
@@ -223,6 +224,8 @@ export class AuthService {
     userToUpdate.name = name;
     // userToUpdate.address = address;
     //!(Đã xong) Lỗi update xong bị sai tài khoản vì chưa bcrypt:
+    //!(Chưa Xong) Đây chỉ là cập nhật không ảnh hưởng relation:
+    //todo: Cập nhật có ảnh hưởng relation thì xem Task Service
     userToUpdate.password = await bcrypt.hash(password, 10);
 
     await userToUpdate.save();
