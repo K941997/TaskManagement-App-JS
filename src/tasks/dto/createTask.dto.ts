@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { IsArray, IsNotEmpty, IsNumber, IsString, MaxLength, ValidateIf } from 'class-validator';
 import { IsNull } from 'typeorm';
+import { IsValidArrayNumber } from '../custom decorators/IsValidArrayNumber.decorator';
 
 export class CreateTaskDto {
   @IsNotEmpty() //Không được rỗng
@@ -10,6 +11,7 @@ export class CreateTaskDto {
   @IsString()
   description: string;
 
-  @IsArray()
+  // @IsArray()
+  @IsValidArrayNumber() //!Custom Decorator (For CreateUpdateTask with Relation)
   categoryIds: number[];
 }

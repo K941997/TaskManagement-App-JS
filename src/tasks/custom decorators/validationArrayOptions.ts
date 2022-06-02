@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-type ValidationArrayOptions = { //!Custom Decorator (For UpdateTask with Relation)
+type ValidationArrayOptions = { //!Custom Decorator (For CreateUpdateTask with Relation)
     required?: boolean;
     minSize?: number;
     maxSize?: number;

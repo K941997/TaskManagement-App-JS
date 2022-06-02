@@ -60,6 +60,7 @@ async function bootstrap() {
   //Nếu để Global ValidationPipe thì bắt buộc phải tạo DTO class-validator @IsNotEmpty
   app.useGlobalPipes(
     new ValidationPipe({
+      // skipMissingProperties: true,
       whitelist: true,
     }),
   );

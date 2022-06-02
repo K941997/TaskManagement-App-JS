@@ -226,14 +226,11 @@ export class TasksService {
 
     const { title, description, categoryIds } = updateTaskDto;
 
-    if(!categoryIds){
-      updatedTask.title = title;
-      updatedTask.description = description;
-      await updatedTask.save();
+    if (title) { updatedTask.title = title }
 
-    } else if (categoryIds) {
-      updatedTask.title = title;
-      updatedTask.description = description;
+    if (description != undefined || description) { updatedTask.description = description }
+
+    if (categoryIds) {
       updatedTask.taskToCategories = [] ; //!ManyToMany Relation Xem lai
   
       for (let i = 0; i < categoryIds.length; i++) {
@@ -251,11 +248,10 @@ export class TasksService {
         }
       }
   
-      await updatedTask.save();
     }
-    
     // await this.clearCache(); //!Cache Manually
-    return updatedTask;
+    return this.taskRepository.save(updatedTask)
+   
   }
 
   //!Delete Task use CASL Role:

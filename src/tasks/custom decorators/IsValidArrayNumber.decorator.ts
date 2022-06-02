@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { ArrayMaxSize, ArrayMinSize, ArrayUnique, IsDefined, IsNumber, IsOptional } from "class-validator";
 /* eslint-disable prettier/prettier */
-export function IsValidArrayNumber( //!Custom Decorator (For UpdateTask with Relation)
+export function IsValidArrayNumber( //!Custom Decorator (For CreateUpdateTask with Relation)
     { required, minSize, maxSize, unique }: ValidationArrayOptions = { 
       unique: true,
     },
