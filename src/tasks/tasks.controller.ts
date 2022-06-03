@@ -171,6 +171,9 @@ export class TasksController {
   @UseGuards(JwtAuthGuard) //!JwtAuthGuard
   async deleteTask(
     @Param('id', ParseIntPipe) id: number,
+    // @Param() param //!Dành cho Delete Multi
+    // @Query('keys') keys: string[] //!Dành cho Delete Multi
+    // @Body() deleteTopicMulti: DeleteTopicMultiDto //!Dành cho Delete Multi
     @Req() req: RequestWithUser,
   ): Promise<void> {
     const user = req.user

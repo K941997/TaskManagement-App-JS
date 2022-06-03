@@ -17,6 +17,9 @@ $ npm run start:dev (sử dụng sẽ auto nodemon)
 -> Open localhost:3000/
 
 # 1. Module -> Controller(Route) -> Service(Logic) -> Entity(Model) + Repository:
+- Tạo tất cả:
+  $ nest g resource messages
+
 - Để tạo 1 Module:
   $ nest g module messages
 
@@ -216,25 +219,6 @@ import {MessService, MessRepository}
   search: string;
 
 
-# 2. CRUD: (Before TypeOrm SQL Not Done)
-- Service tasks.service.ts:
-  $ npm install --save uuid
-  ...
-  import { v4 as uuid } from 'uuid'; //tạo id ngẫu nhiên
-
-  Create Task
-  Get All Tasks + Get All Tasks Search Filter
-  Get Task By Id
-  Delete Task By Id
-  Update Status Task
-
-- Controller tasks.controller.ts:
-  Create Task
-  Get All Tasks + Get All Tasks Search Filter
-  Get Task By Id
-  Delete Task By Id
-  Update Status Task
-
 # 3. Validation Pipe: (@IsNotEmpty() DTO)
   $ npm install class-validator class-transformer --save
 
@@ -315,113 +299,11 @@ import {MessService, MessRepository}
   }
 
 
-### Task Management (Part 2):
-# 1. Database TypeOrm PostgreSQL:
-  $ npm install --save @nestjs/typeorm typeorm pg @nestjs/config
-
-- typeorm.config.ts:
-  import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-
-  export const typeOrmConfig: TypeOrmModuleOptions = {
-    type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'Kay5633413',
-    database: 'taskmanagement',
-    entities: [__dirname + '/../**/*.entity{.ts,.js}'], //Tags Entity
-    synchronize: true, //nên dùng migrations thay cho synchronize: true
-  };
-
-- app.module.ts:
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), TasksModule],
-  controllers: [AppController],
-  providers: [AppService],
-
-# 2. Entity: (Model, Thực thể Table in Database)
-- Entity task.entity.ts:
-  @Entity()
-  export class TaskEntity extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column()
-    title: string;
-
-    @Column()
-    description: string;
-
-    @Column()
-    status: TaskStatus;
-  }
-
-# 3. Repository: (Kho Chứa Thực Thể Entity + Service)
-- Repository task.repository.ts:
-  import { TaskEntity } from './task.entity';
-  import { EntityRepository, Repository } from 'typeorm';
-
-  @EntityRepository(TaskEntity)
-  export class TaskRepository extends Repository<TaskEntity> {}
-
-- Module tasks.module.ts:
-  imports: [TypeOrmModule.forFeature([TaskRepository])],
-  controllers: [TasksController],
-  providers: [TasksService],
-
-
-# 4. uninstall uuid:
-- taskStatus.enum.ts:
-  export enum TaskStatus {
-    OPEN = 'OPEN',
-    IN_PROGRESS = 'IN_PROGRESS',
-    DONE = 'DONE',
-  }
-
-$ npm uninstall uuid
-
-# 5. Global ValidationPipe DTO:
-- main.ts:
-  app.setGlobalPrefix('api');
-
-  app.useGlobalPipes(
-    //!Nếu ko để Global ValidationPipe thì trong Controller phải có ValidationPipe mới dùng được DTO
-    //!Nếu để Global ValidationPipe thì bắt buộc phải tạo DTO class-validator @IsNotEmpty
-    new ValidationPipe({
-      whitelist: true,
-    }),
-  );
-
-# 6. CRUD (with TypeORM SQL) (Not Done):
-- Promise<void> to return nothing
-
-- Repository task.repository.ts:
-- Service tasks.service.ts:
-- Controller tasks.controller.ts:
-
-  CRUD
-  + Create Task
-  + Get All Task + Get All Task Search Filter
-  + Update Task's Status
-  + Update Task
-  + Delete Task
-
-- Not Done:
-  + Get All Tasks id không theo thứ tự, Chưa trả về khi Update + Delete là Đã thành công
-  + Get All Tasks Search Filter (gõ title "hianhem" ko tìm được "hi anh em")
 
 
 
-### RequestWithUser: (For Auth, For Relation)
-- requestWithUser.interface.ts:
-  import { UserEntity } from './user.entity';
-  import { Request } from 'express';
 
-  export interface RequestWithUser extends Request {
-    user: UserEntity;
-  }
-
-
-### Authentication User:
+### Authentication User: (Thêm bớt vào phần dưới)
 # 1. Settings:
 $ nest g module auth
 $ nest g controller auth
@@ -445,7 +327,7 @@ $ nest g service auth
 
 - user.entity.ts:
   @Entity()
-  @Unique(['username']) //Không trùng lặp username
+  @Unique(['username']) //Không trùng lặp username (Optional Xem lại docs TypeOrm thêm luôn unique: true)
   export class UserEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
@@ -457,7 +339,7 @@ $ nest g service auth
     password: string;
   }
 
-- user.repository.ts:
+- user.repository.ts: (Optional)
   @EntityRepository(UserEntity)
   export class UserRepository extends Repository<UserEntity> {}
 
@@ -543,7 +425,7 @@ $ npm install @nestjs/jwt @nestjs/passport passport passport-jwt
     @UseGuards(AuthGuard())
 
 
-# 5. Session Cookie: (Bộ nhớ lưu tạm thông tin người dùng (Reset nếu Timeout))
+# 5. Session Cookie: (Bộ nhớ lưu tạm thông tin người dùng (Reset nếu Timeout)) (Optional - Không dùng vì dùng JWT)
 $ npm install @nestjs/passport passport @types/passport-local passport-local @types/express
 $ npm install @nestjs/jwt passport-jwt @types/passport-jwt cookie-parser @types/cookie-parser
 $ npm install express-session @types/express-session
@@ -593,67 +475,482 @@ $ npm install express-session @types/express-session
 
 - Use AuthGuard -> Auth Controller (!Xem lai)
 
-###### New Auth:
-- authenticatedGuard.guard.ts
-- $ session
-- main.ts:
-- auth.module
-- localGuard
-- sessionCookieSerialize
-- auth.controller
-- app.module
 
 # (Đã fix) Lỗi Controller để '/session' không được vì chưa bật session ở app.module.
-# (Đang làm lại) Authen Sign Up Sign In ở tron Service ko ở Repository:
-//Bcrypt + Guard:
-- B00: auth.service
-- B01: auth.module
-- B02: localAuthentication.guard.ts
-
-//JWT + Cookie:
-(Generating tokens)
-- auth.module
-- auth.service
-- JwtPayload.interface
-- auth.controller
-- main.ts
-(Receiving tokens)
-- main.ts
-- jwtStrategy.strategy
-- auth.module
-(Requiring authentication from our users)
-- jwt-authentication.guard.ts
-- categories.controller.ts   @UseGuards(JwtAuthenticationGuard)
-- auth.controller.ts   @UseGuards(JwtAuthenticationGuard)
-
-
-//Session:
-- B1: auth.service
-- B2: localStrategy.strategy (Using PassportJS to Log In and Authenticate)
-- B3: auth.controller
-- B4: logInWithCredentialsGuard.ts (Verify the credentials provided by the user)
-- B5: localSerializer.serializer.ts (Determines the data stored inside of the session)
 
 
 
 
 
+##############################OVERVIEW###################################
+# (Đã xong) Middlewares
+
+##############################CRUD TypeORM PostgreSQL Search Pagination###################################
+# (Đã Xong) Relations Đang gặp lỗi Many To Many tạo 1 Task chứa Categories [1,2,3] 2, 3 không tồn tại -> bị Internal server error
+# (Đã Xong) Relations Nếu nhập API phải để "categoryIds": [] thì mới được rỗng, nếu ko nhập "categoryIds" thì sẽ lỗi
+# (Đã Xong) Relations TypeOrm:
+  + JoinColumn() dùng 1 phía  cho OneToOne, ManyToOne (Có thể bỏ qua)
+  + JoinTable() dùng 1 phía cho ManyToMany
+# (Đã Xong) Relations Custom Relation ManyToMany CRUD:
+  + Create Task + Category bị lỗi Category Not Found
+# (Đã Xong) Relations OneToOne, Relation ManyToMany change OneToMany + ManyToOne in Tables: "TaskToCategories", "Tasks", "Categories"
+# (Đã xong) CRUD Read User By /:username Vì trùng /:id: thay = /username/:username
+# (Đã Xong) .env trong Migrations
+# (Đã Xong) DBeaver
+# (Đã xong) CRUD with MongoDB
+# (Chưa Xong) TypeOrm Query Builder in Service
+# (Đã Xong) Pagination Infinite Scroll (Phân trang) (Không dùng)
+# (Đã xong) Pagination Get All Tasks + Pagination (Phân trang)
+# (Đã xong) Paginate + Search FilterByTitle (Phân trang + Tìm kiếm Tasks theo Title)
+# (Đã xong) Search Tại sao Search Interface lại Search được DB (Trong Logic có lấy từ Repository)
+# (Chưa xong) Search "ba" vẫn tìm thấy "bá" (Dùng ElasticSearch)
+# (Chưa Xong) Search ElasticSearch (+ Docker)
+# (Chưa xong) Comment
 
 
-### Task Management (Part 3):
-# 1. JwtStrategy Guards:
-- tasks.module.ts:
-  imports: [TypeOrmModule.forFeature([TaskRepository]), AuthModule],
+##############################SERCURITY###################################
+# (Đã Xong) SessionCookies
+# (Đã Xong) JWTToken (thay cho SessionCookies)
 
-- tasks.controller.ts:
-  import { AuthGuard } from '@nestjs/passport';
-  //...
-  @Delete('/:id')
-  @UseGuards(AuthGuard())
-  ...
+# (Đã xong) Refresh JWT Token (Để bảo mật, không phải đăng nhập lại)
+# (Đã Xong) Cookie-parser
+# (Đã Xong) Refresh Unauthorized khi lấy refresh token (Vì chưa cài cookie-parser)
+# (Đã Xong) Refresh Dùng Access Token mới ko Update được, dùng Access Token cũ thì được
+# (Đã Xong) Refresh (Vẫn đúng Logic) vì dùng Access Token mới Update được, dùng Access Token cũ vẫn được
+
+# (Chưa Xong) Firebase
+# (Chưa Xong) Login with Firebase
+# (Chưa Xong) Verify Link Nodemailer
+# (Chưa Xong) Verify Phone Sendgrid Twilio
+# (Chưa Xong) Email Google Authent
+
+# (Đã Xong) LogOut xóa hết các token
+
+# (Đã xong) CASL Role, isAdmin, isCreator
+# (Đã xong) CASL Super Admin, Normal Admin
+# (Đã Xong) CASL add to CRUD Tasks
+# (Đã Xong) CASL add to CRUD User //!Lỗi update xong bị sai mật khẩu Login do chưa bcrypt
+# (Đã xong) CASL add to CRUD User: Xóa User Xóa Task, Không Xóa Categories (Không để onCascade Delete)
+
+# (Chưa Xong) Helmet
+# (Chưa Xong) CORS
+# (Chưa Xong) CSRF Protection CSURF
+# (Chưa Xong) Rate limiting (Giới hạn tốc độ)
+##############################TECHNIQUES###################################
+# (Đã xong) Redis
+# (Đã xong) Cache In-memory, Cache Manually, Cache Redis (Vote In-memory + Redis, Cache dùng ở Controller)
+# (Chưa xong) Serialization (Tạo Custom, Entity: @Exclude-Trả về Loại bỏ hiển thị, @Expose-Trả về Phơi bày, Transform, SerializeOptions() in Controller)
+# (Chưa Xong) Versioning (for Microservice)
+# (Đã Xong) Task Scheduling (Lịch Tác Vụ * * * * * *)
+# (Đã Xong) Queues (Hàng Đợi để tăng hiệu suất)
+# (Chưa Xong) Logging (LOG như console.log())
+# (Chưa Xong) Cookies
+# (Chưa Xong) Events. (Dùng để gửi mail chúc mừng sinh nhật khách)
+# (Chưa Xong) Compression (Nén để tăng tốc độ ứng dụng)
+# (Chưa Xong) Upload file
+# (Chưa Xong) HTTP Module (Axios)
+# (Chưa Xong) Server Sent Event (Real-time 1 chiều Đồ thị, News Feed khác WebSockets Real-time 2 chiều Chat Online, Game)
+##############################OTHERS###################################
+
+# (Chưa Xong) Transactions (Giao dịch)
+# (Chưa Xong) Unit Test, E2E
+# (Chưa Xong) GraphQL
+# (Chưa Xong) TypeScript
+# (Chưa Xong) Websocket Streaming
+# (Chưa xong) Kafka
+# (Chưa Xong) Docker (Chứa C#, PHP, NodeJS, Java, ...)
+# (Chưa Xong) Microservice (Optional)
+
+##############################JOBS###################################
+###### Tìm hiểu Swagger (Optional)
+###### Slug bổ trợ cho tìm kiếm theo title(string) ko phải theo id(number)
+
+###### CRUD Topic:
+- (Chưa xong) Admin: Create Topic, Get All Search + Pagination, Get One by Key=Slug, Update One, Delete One, Delete Multi
+- (Xong) Client: Get All No Search + No Pagination
+
+# Create A Topic by Admin with KeySlug:
+- service:
+ slugify(key: string) { //Key -> Slug
+    return slug(key, {lower: true}).toString(36)
+  }
+  async createByAdmin(createTopicDto: CreateTopicDto): Promise<Topic> {
+    const topic = this.topicRepository.create( createTopicDto );
+    topic.slug = this.slugify(createTopicDto.key);
+    try {
+      await this.topicRepository.save(topic);
+    } catch (err) {
+      if (err.code === '23505') {
+        throw new ConflictException(
+          'Duplicate Description already exists',
+        );
+      } 
+      else {
+        throw new InternalServerErrorException();
+      }
+    }
+    return topic;
+  }
+- controller:
+  @Post()
+  @UsePipes(ValidationPipe)
+  async create(@Body() createTopicDto: CreateTopicDto): Promise<Topic> {
+    return this.topicService.createByAdmin(createTopicDto);
+  }
+
+# Get All Topic + Pagination with KeySlug:
+- service:
+  getAllPaginate(options: IPaginationOptions): Observable<Pagination<TopicInterface>> {
+    const queryBuilder = this.topicRepository.createQueryBuilder('topic');
+    // queryBuilder.orderBy('topic.createdAt', 'DESC'); //todo: New to Old
+    queryBuilder.orderBy('topic.key', 'ASC');
+    return from (paginate<TopicInterface>(queryBuilder, options));
+  }
+  //!SearchFilter + Pagination: (Tìm kiếm + Phân trang)
+  searchFilterPaginate(options: IPaginationOptions, topic: TopicInterface): Observable<Pagination<TopicInterface>>{
+    return from(this.topicRepository.findAndCount({
+        skip: Number(options.page) * Number(options.limit) || 0, //!page * limit = offset
+        take: Number(options.limit) || 10,
+        order: {key: "ASC"},
+        // relations: ['author', 'taskToCategories'],
+        select: ['key', 'slug', 'description'], //add more from interface
+        where: [
+            { slug: Like(`%${topic.slug}%`)}
+        ]
+    })).pipe(
+        map(([topics, totalTopics]) => {
+            const topicsPageable: Pagination<TopicInterface> = {
+                items: topics,
+                links: {
+                    first: options.route + `?limit=${options.limit}`,
+                    previous: options.route + ``,
+                    next: options.route + `?limit=${options.limit}&page=${Number(options.page) + 1}`,
+                    last: options.route + `?limit=${options.limit}&page=${Math.ceil(totalTopics / Number(options.limit))}`
+                },
+                meta: {
+                    currentPage: Number(options.page),
+                    itemCount: topics.length,
+                    itemsPerPage: Number(options.limit),
+                    totalItems: totalTopics,
+                    totalPages: Math.ceil(totalTopics / Number(options.limit))
+                }
+            };              
+            return topicsPageable;
+        })
+      ) 
+  }
+- controller:
+  //!Get All Topics + SearchFilterByKeySlug + Pagination:
+  @Get()
+  index(
+    @Query('page') page: number = 1, //page * limit = offset
+    @Query('limit') limit: number = 10,
+    @Query('slug') slug: string
+  ): Observable<Pagination<TopicInterface>> {
+      limit = limit > 100 ? 100 : limit;
+      if (slug === null || slug === undefined) {
+        return this.topicService.getAllPaginate(
+          {
+            page: Number(page), 
+            limit: Number(limit), 
+            route: 'http://localhost:5000/admin/topics',  
+          },
+        );
+    } else if (slug) {
+        return this.topicService.searchFilterPaginate(
+            {
+              page: Number(page),
+              limit: Number(limit),
+              route: 'http://localhost:5000/admin/topics',
+            },
+            { slug }
+        );
+    }
+  }
+
+# Get All by Client with KeySlug:
+- service:
+ async findAllByClient(): Promise<Topic[]> {
+    const query = this.topicRepository.createQueryBuilder('topic')
+    .orderBy("topic.key");
+    const allTopics =  await query.getMany();
+    return allTopics;
+  }
+
+# Get One by Admin with KeySlug:
+-service:
+  async findOneByAdminKeySlug(slug: any): Promise<Topic> {
+      const topic = await this.topicRepository.findOne(slug);
+      if (!topic) {
+        throw new NotFoundException(`Topic not found !`);
+      } else {
+        return topic;
+      }
+  }
+- controller:
+  @Get(':slug')
+  async findOne(@Param('slug') slug): Promise<Topic> {
+    return await this.topicService.findOneByAdminKeySlug({slug});
+  }
+
+# Update A Topic by Admin with KeySlug:
+- Nếu update title, ko update description thì phải thêm @IsOptional() vào DTO hoặc custom decorator
+- dto:
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @IsArray()
+  @IsOptional()
+  // @IsValidArrayNumber() //custom decorator nếu ko dùng @IsOptional()
+  topicTranslate: number[];
+
+- service:
+  const topicToUpdate = await this.topicRepository.findOne({slug: slug});
+  if (!topicToUpdate) {
+    throw new NotFoundException(`Topic not found !`);
+  } else {
+    const { description, topicTranslate } = updateTopicDto;
+    // if (key) { //!Cant update key because is is Primary Key
+    //   topicToUpdate.key = key;
+    //   topicToUpdate.slug = this.slugify(updateTopicDto.key);
+    // }
+    if (description != undefined || description) { topicToUpdate.description = description }
+    return this.topicRepository.save(topicToUpdate)
+  }
+
+- controller:
+  @Patch(':slug')
+  async update(@Param() param, @Body() updateTopicDto: UpdateTopicDto) {
+    return this.topicService.updateByAdmin(param.slug, updateTopicDto);
+  }
+
+# Delete A Topic by Admin with KeySlug:
+- service:
+  async removeByAdmin(slug: string): Promise<DeleteResult> {
+    const topicToDelete = await this.topicRepository.findOne({slug: slug});
+    if (!topicToDelete) {
+      throw new NotFoundException(`Topic not found !`);
+    } else {
+      return await this.topicRepository.delete({ slug: slug});
+    }
+  }
+
+- controller:
+  @Delete(':slug')
+  remove(@Param() param ) {
+    return this.topicService.removeByAdmin(param.slug);
+  }
+
+# Delete Multiples Topics by Admin with KeySlug:
+- service:
+  async removeMulti(slugs: string[]){
+    const topics = await this.topicRepository.find({
+      slug: In(slugs)
+    })
+    console.log(slugs)
+    topics.filter(topic => !slugs.includes(topic.slug))
+    const { affected } = await this.topicRepository.delete({slug: In(slugs)})
+    if (affected === 0) {
+      throw new BadRequestException('Product Multi not found')
+    }
+  }
+
+- controller:
+  @Delete()
+  removeMulti(
+    // @Param('slugs', ParseArrayPipe) slugs: string[]
+    @Query('slugs', ParseArrayPipe) slugs: string[]
+    // @Body() deleteTopicMulti: DeleteTopicMultiDto
+  ){
+    // return this.topicService.removeMulti(deleteTopicMulti.slugs) //@Body
+    return this.topicService.removeMulti(slugs)
+  }
 
 
-# 2. Relation:
+
+##############################OVERVIEW###################################
+###### Middleware:
+# 1. Settings:
+- create folder middlewares:
+  + audit.middleware.ts
+    @Injectable()
+    export class AuditMiddleware implements NestMiddleware {
+        use(req: Request, res: Response, next: Function) {
+            console.log("Logging DELETE request Headers ", req.headers);
+            next()
+        }
+    }
+- task.module:
+  export class TasksModule implements NestModule { //!Middleware
+    configure(consumer: MiddlewareConsumer) {
+      consumer
+        .apply(AuditMiddleware)
+        .forRoutes({ path: 'tasks/*', method: RequestMethod.DELETE }) //todo: task.controller Delete
+    } 
+  }
+
+##############################CRUD TypeORM PostgreSQL Search Pagination###################################
+###### Cần làm gấp:
+- Theo Tasks và Categories
+# 1. Database TypeOrm PostgreSQL:
+  $ npm install --save @nestjs/typeorm typeorm pg @nestjs/config
+
+- ormconfig.js
+  let dbConfig = {
+    type: 'postgres',
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    
+    migrationsRun: false,
+    synchronize: false,
+    logging: false,
+
+    migrations: ['dist/migrations/*.js'],
+    entities: ['**/*.entity.js'],
+    
+    cli: {
+      migrationsDir: 'migrations', // create migration file and save to this folder
+    },
+  };
+  
+  switch (process.env.NODE_ENV) {
+    case 'development':
+      dbConfig = {
+        ...dbConfig,
+        migrationsRun: true,
+        logging: false,
+      };
+      break;
+    case 'test':
+      dbConfig = {
+        ...dbConfig,
+        // type: 'sqlite',
+        migrationsRun: true,
+        entities: ['**/*.entity.ts'],
+      };
+      break;
+    case 'production':
+      dbConfig = {
+        ...dbConfig,
+      };
+      break;
+  
+    default:
+      throw new Error('unknow environment typeorm config');
+  }
+  
+  module.exports = dbConfig;
+  
+
+- app.module.ts:
+  imports: [TypeOrmModule.forRoot(), TasksModule],
+  controllers: [AppController],
+  providers: [AppService],
+
+- package.json:
+  scripts: [
+    "typeorm": "node --require ts-node/register node_modules/typeorm/cli.js",
+    "migration:create": "npm run build && npm run typeorm migration:create -- -n",
+    "migration:generate": "npm run build && npm run typeorm migration:generate -- -n",
+    "migration:up": "npm run build && npm run typeorm migration:run",
+    "migration:down": "npm run build && npm run typeorm migration:revert"
+  ]
+
+  "typeorm": "^0.2.45",
+
+# 2. Entity: (Model, Thực thể Table in Database)
+- Entity task.entity.ts:
+  @Entity()
+  export class TaskEntity extends BaseEntity {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    title: string;
+
+    @Column()
+    description: string;
+
+    @Column()
+    status: TaskStatus;
+  }
+
+# 3. Repository: (Kho Chứa Thực Thể Entity + Service) (Optional)
+- Repository task.repository.ts:
+  import { TaskEntity } from './task.entity';
+  import { EntityRepository, Repository } from 'typeorm';
+
+  @EntityRepository(TaskEntity)
+  export class TaskRepository extends Repository<TaskEntity> {}
+
+# 3. Add TypeOrm To Task.Module (Bắt buộc):
+- Module tasks.module.ts với custom Repository (Optional):
+  imports: [TypeOrmModule.forFeature([TaskRepository])],
+  controllers: [TasksController],
+  providers: [TasksService],
+
+- Module tasks.module.ts không có custom Repository (Vote):
+  imports: [TypeOrmModule.forFeature([TaskEntity])],
+  controllers: [TasksController],
+  providers: [TasksService],
+
+
+# 4. uninstall uuid:
+$ npm uninstall uuid
+
+# Task Enum Status (Optional):
+- taskStatus.enum.ts:
+  export enum TaskStatus {
+    OPEN = 'OPEN',
+    IN_PROGRESS = 'IN_PROGRESS',
+    DONE = 'DONE',
+  }
+
+
+# 5. Global ValidationPipe DTO:
+- main.ts:
+  app.setGlobalPrefix('api');
+
+  app.useGlobalPipes(
+    //!Nếu ko để Global ValidationPipe thì trong Controller phải có ValidationPipe mới dùng được DTO
+    //!Nếu để Global ValidationPipe thì bắt buộc phải tạo DTO class-validator @IsNotEmpty
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
+
+# 6. CRUD (with TypeORM SQL) (Done):
+- Promise<void> to return nothing
+
+- Repository task.repository.ts:
+- Service tasks.service.ts:
+- Controller tasks.controller.ts:
+
+  CRUD
+  + Create Task
+  + Get All Task + Get All Task Search Filter
+  + Update Task's Status
+  + Update Task
+  + Delete Task
+
+- Not Done:
+  + Get All Tasks id không theo thứ tự (chỉnh trong entity), Chưa trả về khi Update + Delete là Đã thành công
+  + Get All Tasks Search Filter (gõ title "hianhem" ko tìm được "hi anh em") (Phải dùng Elastic Search nâng cao)
+
+### RequestWithUser: (For Auth, For Relation) (Optional)
+- requestWithUser.interface.ts:
+  import { UserEntity } from './user.entity';
+  import { Request } from 'express';
+
+  export interface RequestWithUser extends Request {
+    user: UserEntity;
+  }
+
+###### Relation:
 # eager: true + eager: false (For OneToMany ManyToOne) (chỉ 1 phía được eager:true, related entities always to be included) 
 # cascade: true (saving the related entities)
 # @JoinTable (For Many to Many Relation) (chỉ 1 phía được sử dụng)
@@ -815,101 +1112,10 @@ $ npm install express-session @types/express-session
   public category: CategoryEntity
 
 
-
-
-##############################SERCURITY###################################
-# (Đã Xong) JWTToken thay cho SessionCookies
-
-# (Đã xong) Refresh JWT Token (Để bảo mật, không phải đăng nhập lại)
-# (Đã Xong) vì unauthorized khi lấy refresh token (Vì chưa cài cookie-parser)
-# (Đã Xong) vì dùng Access Token mới ko Update được, dùng Access Token cũ thì được
-# (Đã Xong) (Vẫn đúng Logic) vì dùng Access Token mới Update được, dùng Access Token cũ vẫn được
-
-# (Đã Xong) LogOut xóa hết các token
-
-# (Đã Xong) Đang gặp lỗi Many To Many tạo 1 Task chứa Categories [1,2,3] 2, 3 không tồn tại -> bị Internal server error
-# (Đã Xong) Nếu nhập API phải để "categoryIds": [] thì mới được rỗng, nếu ko nhập "categoryIds" thì sẽ lỗi
-# (Đã Xong) Relations TypeOrm:
-  + JoinColumn() dùng 1 phía  cho OneToOne, ManyToOne (Có thể bỏ qua)
-  + JoinTable() dùng 1 phía cho ManyToMany
-# (Đã Xong) Custom Relation ManyToMany CRUD:
-  + Create Task + Category bị lỗi Category Not Found
-
-# (Đã xong) CASL Role, isAdmin, isCreator
-# (Đã Xong) CASL CRUD Tasks
-# (Đã Xong) CASL CRUD User //!Lỗi update xong bị sai mật khẩu Login do chưa bcrypt
-# (Đã xong) CASL CRUD User: Xóa User Xóa Task, Không Xóa Categories (Không để onCascade Delete)
-
-# (Đã xong) Read User By /:username Vì trùng /:id: thay = /username/:username
-# (Đã Xong) Relation OneToOne, Relation ManyToMany change OneToMany + ManyToOne in Tables: "TaskToCategories", "Tasks", "Categories"
-
-# (Đã Xong) .env trong Migrations
-# (Đã Xong) học DBeaver
-# (Đã xong) CRUD with MongoDB:
-# (Đã xong) CASL Super Admin, Normal Admin
-# (Đã xong) Middlewares
-# (Chưa Xong) TypeOrm Query Builder in Service
-# (Chưa Xong) Helmet
-# (Chưa Xong) CORS
-# (Chưa Xong) CSRF Protection CSURF
-# (Chưa Xong) Rate limiting (Giới hạn tốc độ)
-##############################TECHNIQUES###################################
-# (Đã xong) Redis
-# (Đã xong) Cache In-memory, Cache Manually, Cache Redis (Vote In-memory + Redis, Cache dùng ở Controller)
-# (Chưa xong) Serialization (Tạo Custom, Entity: @Exclude-Trả về Loại bỏ hiển thị, @Expose-Trả về Phơi bày, Transform, SerializeOptions() in Controller)
-# (Chưa Xong) Versioning (for Microservice)
-# (Đã Xong) Task Scheduling
-# (Chưa Xong) Queues
-# (Chưa Xong) Logging
-# (Chưa Xong) Cookies
-# (Chưa Xong) Events. (Dùng để gửi mail chúc mừng sinh nhật khách)
-# (Chưa Xong) Cookie-parser
-# (Chưa Xong) Compression (Nén để tăng tốc độ ứng dụng)
-# (Chưa Xong) Upload file
-# (Chưa Xong) HTTP Module (Axios)
-# (Chưa Xong) Server Sent Event (Real-time 1 chiều Đồ thị, News Feed khác WebSockets Real-time 2 chiều Chat Online, Game)
-##############################OTHERS###################################
-# (Đã Xong) Pagination Infinite Scroll (Phân trang) (Không dùng)
-# (Đã xong) Get All Tasks + Pagination (Phân trang)
-# (Đã xong) Paginate + Search FilterByTitle (Phân trang + Tìm kiếm Tasks theo Title)
-# (Đã xong) Tại sao Search Interface lại Search được DB (Trong Logic có lấy từ Repository)
-# (Chưa xong) Search "ba" vẫn tìm thấy "bá" (Dùng ElasticSearch)
-# (Chưa Xong) ElasticSearch (+ Docker)
-# (Chưa xong) Comment
-
-# (Chưa Xong) Verify Link Nodemailer
-# (Chưa Xong) Verify Phone Sendgrid Twilio
-# (Chưa Xong) Email Google Authent
-# (Chưa Xong) Transactions (Giao dịch)
-
-# (Chưa Xong) Unit Test, E2E
-# (Chưa Xong) GraphQL
-# (Chưa Xong) TypeScript
-# (Chưa Xong) Websocket Streaming
-# (Chưa xong) Kafka
-# (Chưa Xong) Docker (Chứa C#, PHP, NodeJS, Java, ...)
-# (Chưa Xong) Microservice (Optional)
-
-##############################OVERVIEW###################################
-###### Middleware:
-# 1. Settings:
-- create folder middlewares:
-  + audit.middleware.ts
-    @Injectable()
-    export class AuditMiddleware implements NestMiddleware {
-        use(req: Request, res: Response, next: Function) {
-            console.log("Logging DELETE request Headers ", req.headers);
-            next()
-        }
-    }
-- task.module:
-  export class TasksModule implements NestModule { //!Middleware
-    configure(consumer: MiddlewareConsumer) {
-      consumer
-        .apply(AuditMiddleware)
-        .forRoutes({ path: 'tasks/*', method: RequestMethod.DELETE }) //todo: task.controller Delete
-    } 
-  }
+###### Find by Slug (Not id):
+- https://github.com/lujakob/nestjs-realworld-example-app/blob/master/src/article/article.service.ts
+- Tạo 1 column slug trong entity
+- Trong service cài slug là cái mình muốn tìm kiếm ví dụ key
 
 ##############################TECHNIQUES###################################
 ###### Redis:
@@ -978,7 +1184,7 @@ $ npm install express-session @types/express-session
       max: 100, //maximum number of items in Cache
     }),
 
-###### Task Scheduling: (Lập lịch tác vụ)
+###### Task Scheduling: (Lập lịch tác vụ - nâng cao)
 $ npm install --save @nestjs/schedule
 $ npm install --save-dev @types/cron
 - app.module:
@@ -1127,7 +1333,7 @@ $ npm install --save-dev @types/cron
   }
 
 
-###### Queues: (Phải ở App.Module)
+###### Queues: (Phải ở App.Module - nâng cao)
 - Xử lý mượt mà, tăng hiệu suất ứng dụng
 $ npm install --save @nestjs/bull bull
 $ npm install --save-dev @types/bull
@@ -1185,6 +1391,10 @@ $ npm install --save-dev @types/bull
   }
 
 
+###### Loggers (nâng cao):
+- Logger ở LOG (console.log()), Exception filters ở Response ("status": 403, "error": "Forbidden") 
+
+
 ##############################SERCURITY###################################
 ###### Authentication SignUp SignIn:
 # 1. Session Cookies:
@@ -1210,6 +1420,9 @@ $ npm install @nestjs/passport passport @types/passport-local passport-local @ty
 
 
 ###### Refresh JWT Token (Để bảo mật, không phải đăng nhập lại):
+- (Đã Xong) vì unauthorized khi lấy refresh token (Vì chưa cài cookie-parser)
+- (Đã Xong) vì dùng Access Token mới ko Update được, dùng Access Token cũ thì được
+- (Đã Xong) (Vẫn đúng Logic) vì dùng Access Token mới Update được, dùng Access Token cũ vẫn được
 - Đăng nhập sẽ lưu Access Token + Refresh Token ở Cookie HTTP Only = true
 - Đăng nhập sẽ lưu CurrentHashRefreshToken ở UserEntity Database
 - Login A tạo ra các token, Login B thì CurrentHashRefreshToken của A sẽ giữ nguyên cho đến khi Login A lại
@@ -1374,7 +1587,7 @@ $ npm install @nestjs/passport passport @types/passport-local passport-local @ty
     return user;
   }
 
-###### LogOut: (Xóa hết các token)
+###### LogOut: (Xóa hết các token liên quan đến JWT, Refresh Token)
 - auth.service:
   //!LogOut:  
   public getCookiesForLogOut() {
@@ -1402,11 +1615,25 @@ $ npm install @nestjs/passport passport @types/passport-local passport-local @ty
     request.res.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
   }
 
-  
 
-# (Đã Xong) vì unauthorized khi lấy refresh token (Vì chưa cài cookie-parser)
-# (Đã Xong) vì dùng Access Token mới ko Update được, dùng Access Token cũ thì được
-# (Đã Xong) (Vẫn đúng Logic) vì dùng Access Token mới Update được, dùng Access Token cũ vẫn được
+###### Đặt tên id: Slugify, Subriber (Dự án)
+###### Delete Multiple: (Dự án)
+
+###### Firebase: (Dự án)
+- Firebase dùng để Login FB, Gmail (Frontend làm Login)
+- Backend chỉ cần lấy uid of user in Firebase xong làm authorize cho CRUD
+- User bổ sung thông tin thì sẽ cho vào PostgreSQL, SQL, ...
+$ npm install firebase
+$ npm install -g firebase-tools
+$ npm install firebase-admin --save
+
+- Frontend hbs:
+$ npm i hbs
+$ npm i @types/hbs
+  + main.ts:
+  
+  
+###### TEST E2E: (Dự án)
 
 
 

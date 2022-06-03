@@ -228,10 +228,10 @@ export class TasksService {
 
     if (title) { updatedTask.title = title }
 
-    if (description != undefined || description) { updatedTask.description = description }
+    if (description != undefined || description) { updatedTask.description = description } //!Phải có @Optional() ở DTO thì mới update title mà ko cần update description
 
     if (categoryIds) {
-      updatedTask.taskToCategories = [] ; //!ManyToMany Relation Xem lai
+      updatedTask.taskToCategories = [] ; //!Đặt = [] nên ko cần != undefined như description
   
       for (let i = 0; i < categoryIds.length; i++) {
         const category = await getRepository(CategoryEntity).findOne(categoryIds[i]);
