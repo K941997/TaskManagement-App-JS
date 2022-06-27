@@ -37,8 +37,8 @@ export class CaslAbilityFactory {
 
     }
 
-    can(Action.Update, TaskEntity, {authorId: user.id}); // only if they own it
-    can(Action.Delete, TaskEntity, {authorId: user.id}); // only if they own it
+    // can(Action.Update, TaskEntity, {authorId: user.id}); // only if they own it
+    // can(Action.Delete, TaskEntity, {authorId: user.id}); // only if they own it
 
     can(Action.Update, UserEntity, {id: user.id}); // only if they own it
     can(Action.Delete, UserEntity, {id: user.id}); // only if they own it

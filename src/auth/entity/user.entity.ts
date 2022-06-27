@@ -56,6 +56,8 @@ export class UserEntity extends BaseEntity {
   public currentHashedRefreshToken?: string;
 
   @OneToMany(() => TaskEntity, (task: TaskEntity) => task.author, { eager: false, cascade: true })
+  //!eager: true + eager: false (chỉ 1 phía được eager:true, tự động hiển thị relation, ko cần find({relation: "authorId"})) 
+  //!Cascade, CASCADE để lưu vào database
   //!eager: true (Chỉ đặt 1 bên) để lưu vào database, dùng find sẽ hiển thị, còn QueryBuilder thì dùng LeftJoinAndSelect
   tasks: TaskEntity[];
 
@@ -63,6 +65,8 @@ export class UserEntity extends BaseEntity {
   @JoinColumn( 
     { name: "address_id", referencedColumnName: "id" }
   )
+  //!eager: true + eager: false (chỉ 1 phía được eager:true, tự động hiển thị relation, ko cần find({relation: "authorId"})) 
+  //!Cascade, CASCADE để lưu vào database
   //!eager: true (Chỉ đặt 1 bên) để lưu vào database, dùng find sẽ hiển thị, còn QueryBuilder thì dùng LeftJoinAndSelect
   //!JoinColumn() (Chỉ được đặt 1 bên) dùng cho OneToOne, ManyToOne(Có thể bỏ qua)
   address: Address;

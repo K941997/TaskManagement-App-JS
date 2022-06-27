@@ -2,7 +2,6 @@
 import { IsArray, IsEmpty, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 import { IsNull } from 'typeorm';
 import { IsValidArrayNumber } from '../custom decorators/IsValidArrayNumber.decorator';
-import { IsValidString } from '../custom decorators/IsValidString.decorator';
 
 export class UpdateTaskDto {
   @IsNotEmpty() //Không được rỗng

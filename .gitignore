@@ -1,16 +1,6 @@
 # compiled output
 /dist
 /node_modules
-/env
-/.env
-env
-.env
-abc
-
-/nestjstaskmanagement-a7ecd-firebase-adminsdk-p9uy8-eda4d8c44a.json
-/.nestjstaskmanagement-a7ecd-firebase-adminsdk-p9uy8-eda4d8c44a.json
-nestjstaskmanagement-a7ecd-firebase-adminsdk-p9uy8-eda4d8c44a.json
-.nestjstaskmanagement-a7ecd-firebase-adminsdk-p9uy8-eda4d8c44a.json
 
 # Logs
 logs
@@ -43,3 +33,11 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.env
+environments/*
+
+# Packge
+package-lock.json
+
+# Misc
+TODO.md
