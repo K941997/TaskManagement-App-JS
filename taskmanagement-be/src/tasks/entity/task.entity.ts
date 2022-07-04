@@ -42,7 +42,7 @@ export class TaskEntity extends BaseEntity {
 
   @ManyToOne(() => UserEntity, (author: UserEntity) => author.tasks, { eager: false, onDelete: "CASCADE"}) 
   //!eager: true + eager: false (chỉ 1 phía được eager:true, tự động hiển thị relation, ko cần find({relation: "authorId"})) 
-  //!Cascade, CASCADE để lưu vào database
+  //!Cascade: true để lưu vào database
   //!eager: true (Chỉ đặt 1 bên) để lưu vào database, dùng find sẽ hiển thị, còn QueryBuilder thì dùng LeftJoinAndSelect
   //onDelete: "CASCADE" Xóa User Xóa luôn Task
   //onDelete: "SET NULL" Đặt authorId = null nếu xóa author

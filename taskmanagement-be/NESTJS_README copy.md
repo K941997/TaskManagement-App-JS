@@ -475,18 +475,21 @@ $ npm install express-session @types/express-session
 # (Đã fix) Lỗi Controller để '/session' không được vì chưa bật session ở app.module.
 
 ##############################JOBS###################################
-
-
 # (Đã Xong) CRUD Topic (Entity MultiLanguage)
   + Đọc NESTJS_CRUD_Topic_Normal&MultiLanguage.md
   + Đọc NESTJS_CRUD_Topic_MultiLanguage.md
 # (Đã Xong) CRUD Level (Entity MultiLanguage)
   + Đọc NESTJS_CRUD_Level_MultiLanguage.md
-  + (Đã xong) Delete = SoftDelete để bảo vệ dữ liệu người dùng, muốn khôi phục chỉ việc xóa deleteAt trong database là xong, xóa deleteAt ở cả Level lẫn LevelTranslate nếu có MultiLanguage
+  + (Đã xong) Delete = SoftDelete để bảo vệ dữ liệu người dùng, muốn khôi phục chỉ việc xóa value deleteAt trong database là xong, xóa value deleteAt ở cả Level lẫn LevelTranslate nếu có MultiLanguage
 # (Đã Xong) Slug (Cho CRUD Get All + Search + Pagination) bổ trợ cho tìm kiếm theo title(string) ko phải theo id(number)
 # (Đã có hướng dẫn) Searching (not in CRUD get all)
 # (Đã Xong) i18n (System MultiLanguage)
-# (Chưa xong) Tìm hiểu Swagger (Để Deploy App như đang dùng Postman) (Optional)
+# (Đã xong) Tìm hiểu Swagger (Để Deploy App như đang dùng Postman) (Optional)
+# (Đã xong) Hiển thị 4 cái topics nhiều người chọn nhất, chưa xong vì cần phải CRUD thêm image topic (Đã xong vì fe sẽ hardcode hình ảnh)
+# (Đã xong) TH3: Muốn xóa topic thì phải xóa từng audio - cho onDelete="CASCADE" vào audio trong audios-to-topics.entity (TH1: Xóa Topic -> Xóa luôn các audio, TH2: Xóa Topic -> Không xóa audio)
+# (Đã xong) Thêm deleteAt vào audioToTopic để softDelete
+
+
 ##############################CRUD TypeORM PostgreSQL Search Pagination###################################
 # (Đã Xong) Relations Đang gặp lỗi Many To Many tạo 1 Task chứa Categories [1,2,3] 2, 3 không tồn tại -> bị Internal server error
 # (Đã Xong) Relations Nếu nhập API phải để "categoryIds": [] thì mới được rỗng, nếu ko nhập "categoryIds" thì sẽ lỗi
