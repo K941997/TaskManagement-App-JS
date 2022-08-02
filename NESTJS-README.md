@@ -44,11 +44,11 @@ $ npm i --save class-validator class-transformer
 
 # Auto Validation - Validate Pipe (Validate Pipe) + DTO (Data Transfer Object):
 - Trong main.ts import Global Validate Pipe (hoặc trực tiếp vào Controller):
-  -> Cách 1: Global main.ts:
-  import {Validate Pipe}
-  app.useGlobalPipes(
+-> Cách 1: Global main.ts:
+import {Validate Pipe}
+app.useGlobalPipes(
   new ValidationPipe()
-  );
+);
 
 -> Cách 2: Method Level controller:
 @Post('create')
@@ -89,40 +89,36 @@ this.customersService.createCustomer(createCustomerDto);
       Vì Get('/:email') + Delete('/:email') lấy email -> chỉ được dùng UserParamsDTO.email
 
 # Explicit conversion (Dùng trong Controller) sẽ (ko cần bật Validate Pipe transform: true) ở main.ts:
-
-    @Get(':id')
-    findOne(
-        @Param('id', ParseIntPipe) id: number,
-        @Query('sort', ParseBoolPipe) sort: boolean,
-    ) {
-        console.log(typeof id === 'number'); // true
-        console.log(typeof sort === 'boolean'); // true
-        return 'This action returns a user';
-    }
+@Get(':id')
+findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('sort', ParseBoolPipe) sort: boolean,
+) {
+    console.log(typeof id === 'number'); // true
+    console.log(typeof sort === 'boolean'); // true
+    return 'This action returns a user';
+}
 
 # Disable detailed errors:
-
-    app.useGlobalPipes(
-        new ValidationPipe({
-            disableErrorMessages: true,
-        }),
-    );
+  app.useGlobalPipes(
+      new ValidationPipe({
+          disableErrorMessages: true,
+      }),
+  );
 
 # Stripping properties:
-
-    app.useGlobalPipes(
-        new ValidationPipe({
-            whitelist: true,
-        }),
-    );
+  app.useGlobalPipes(
+      new ValidationPipe({
+          whitelist: true,
+      }),
+  );
 
 # Transform payload objects để chuyển đổi auto convert từ string(default) sang type mình muốn:
-
 - Global:
   app.useGlobalPipes(
-  new ValidationPipe({
-  transform: true,
-  }),
+    new ValidationPipe({
+      transform: true,
+    }),
   );
 
   @Get(':id')
@@ -139,7 +135,6 @@ this.customersService.createCustomer(createCustomerDto);
   }
 
 # Dùng Mapped types (có thể kết hợp các loại DTO với nhau):
-
 - PartialType() khi có nhiều DTO mà trùng các Validate:
   export class CreateCatDto {
   name: string;
@@ -162,64 +157,13 @@ this.customersService.createCustomer(createCustomerDto);
   ) {}
 
 # 3. Not Found Exception:
-
-- Hiển thị lỗi khi không có dữ liệu khi @Get CReadUD a message
+- Hiển thị lỗi khi không có dữ liệu khi @Get a message
   -> messages.controller.ts import NotFoundException
-
-# 4. DI Container Flow DI @Interface (Module giao tiếp thông qua @Interface):
-
-- DI (DEPENDENCY INJECTION) là cách thực hiện Inversion of Control Pattern
-- DI làm giảm sự phụ thuộc giữa các module, dễ dàng thay đổi module, bảo trì, testing
-- Các module không giao tiếp trực tiếp mà qua @Interface
-- Module cấp thấp implement @Interface
-- Module cấp cao gọi Module cấp thấp qua @Interface
-
--> mess.service + mess.repository
-import { Injectable } from "@nestjs/common"
-
-    constructor(public messagesRepo: MessagesRepository) {
-
-    }
-
--> mess.module
-import {MessService, MessRepository}
 
 
 ###### NestJS Project Task Management:
-
 ### Task Management (Part 1):
-# 1. Settings:
-- Controller tasks.controller.ts:
-  @Controller('tasks') //localhost:3000/tasks/
-  export class TasksController {
-    constructor(private tasksService: TasksService) {}
-  }
-
-<!-- - Model Interface task.model.ts: (Remove when use SQL)
-  export interface Task {
-    id: string;
-    title: string;
-    description: string;
-    status: TaskStatus;
-  }
-
-  export enum TaskStatus {
-    OPEN = 'OPEN',
-    IN_PROGRESS = 'IN_PROGRESS',
-    DONE = 'DONE',
-  } -->
-
-
-- DTO createTask.dto.ts:
-  title: string;
-  description: string;
-
-- DTO getTasksSearchFilterDto.dto.ts:
-  status: TaskStatus;
-  search: string;
-
-
-# 3. Validation Pipe: (@IsNotEmpty() DTO)
+# Validation Pipe: (@IsNotEmpty() DTO)
   $ npm install class-validator class-transformer --save
 
 - DTO createTask.dto.ts:
@@ -255,11 +199,9 @@ import {MessService, MessRepository}
 - Service:
  getTaskById(id: string): Task {
     const taskFound = this.tasks.find(task => task.id === id);
-    
     if (!taskFound) {
         throw new NotFoundException(`Task ${id} not found !`);
     }
-
     return taskFound;
   }
 
@@ -297,10 +239,6 @@ import {MessService, MessRepository}
   ): Task {
     return this.tasksService.updateTaskStatus(id, status);
   }
-
-
-
-
 
 
 ### Authentication User: (Thêm bớt vào phần dưới)
@@ -480,16 +418,11 @@ $ npm install express-session @types/express-session
   + Đọc NESTJS_CRUD_Topic_MultiLanguage.md
 # (Đã Xong) CRUD Level (Entity MultiLanguage)
   + Đọc NESTJS_CRUD_Level_MultiLanguage.md
-  + (Đã xong) Delete = SoftDelete để bảo vệ dữ liệu người dùng, muốn khôi phục chỉ việc xóa value deleteAt trong database là xong, xóa value deleteAt ở cả Level lẫn LevelTranslate nếu có MultiLanguage
+  + (Đã xong) Delete = SoftDelete để bảo vệ dữ liệu người dùng, muốn khôi phục chỉ việc xóa deleteAt trong database là xong, xóa deleteAt ở cả Level lẫn LevelTranslate nếu có MultiLanguage
 # (Đã Xong) Slug (Cho CRUD Get All + Search + Pagination) bổ trợ cho tìm kiếm theo title(string) ko phải theo id(number)
 # (Đã có hướng dẫn) Searching (not in CRUD get all)
 # (Đã Xong) i18n (System MultiLanguage)
-# (Đã xong) Tìm hiểu Swagger (Để Deploy App như đang dùng Postman) (Optional)
-# (Đã xong) Hiển thị 4 cái topics nhiều người chọn nhất, chưa xong vì cần phải CRUD thêm image topic (Đã xong vì fe sẽ hardcode hình ảnh)
-# (Đã xong) TH3: Muốn xóa topic thì phải xóa từng audio - cho onDelete="CASCADE" vào audio trong audios-to-topics.entity (TH1: Xóa Topic -> Xóa luôn các audio, TH2: Xóa Topic -> Không xóa audio)
-# (Đã xong) Thêm deleteAt vào audioToTopic để softDelete
-
-
+# (Chưa xong) Tìm hiểu Swagger (Để Deploy App như đang dùng Postman) (Optional)
 ##############################CRUD TypeORM PostgreSQL Search Pagination###################################
 # (Đã Xong) Relations Đang gặp lỗi Many To Many tạo 1 Task chứa Categories [1,2,3] 2, 3 không tồn tại -> bị Internal server error
 # (Đã Xong) Relations Nếu nhập API phải để "categoryIds": [] thì mới được rỗng, nếu ko nhập "categoryIds" thì sẽ lỗi
@@ -510,7 +443,7 @@ $ npm install express-session @types/express-session
 # (Đã xong) Search Tại sao Search Interface lại Search được DB (Trong Logic có lấy từ Repository)
 # (Chưa xong) Search "ba" vẫn tìm thấy "bá" (Dùng ElasticSearch)
 # (Chưa Xong) Search ElasticSearch (+ Docker)
-# (Chưa xong) Comment
+# (Chưa xong) Comment (Relation)
 ##############################OVERVIEW###################################
 # (Đã xong) Middlewares
 ##############################SERCURITY###################################
@@ -557,461 +490,24 @@ $ npm install express-session @types/express-session
 # (Chưa Xong) Server Sent Event (Real-time 1 chiều Đồ thị, News Feed khác WebSockets Real-time 2 chiều Chat Online, Game)
 ##############################OTHERSFUNDAMETALS###################################
 # (Chưa Xong) Transactions (Giao dịch)
-# (Đang Xong) Unit Test, E2E
-  + Đọc NESTJS_Test_E2E.md
+# (Đang Làm) Unit Test, E2E
+  + Đọc NESTJS_Test_UnitTesting_E2E.md
+  + Đang Pending vì cần E2E ở fake database inmemory
 # (Chưa Xong) GraphQL
 # (Chưa Xong) TypeScript
 # (Chưa Xong) Websocket Streaming
 # (Chưa xong) Kafka
 # (Chưa Xong) Docker (Chứa C#, PHP, NodeJS, Java, ...)
+  + Cần phải cập nhật lên Windows 10 Pro mới cài được Docker
+  + Cài Ubuntu luôn
 # (Chưa Xong) Microservice (Optional)
 
 
 ##############################JOBS###################################
 ###### Tìm hiểu Swagger (Optional)
 ###### Slug bổ trợ cho tìm kiếm theo title(string) ko phải theo id(number)
-
-###### CRUD Topic Normal:
-- $ nest g resource topic
-- (Chưa xong) Admin: Create Topic, Get All Search + Pagination, Get One by Key=Slug, Update One, Delete One, Delete Multi
-- (Xong) Client: Get All No Search + No Pagination
-
-# common/entities/base.entity.ts:
-  import {
-    CreateDateColumn,
-    DeleteDateColumn,
-    UpdateDateColumn,
-    VersionColumn,
-  } from 'typeorm';
-  
-  export class BaseEntity {
-    @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
-    createdAt: Date;
-  
-    @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
-    updatedAt: Date;
-  
-    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz' })
-    deletedAt: Date;
-  
-    @VersionColumn({ default: 1 })
-    version: number;
-  }
-  
-
-# Entity:
-export class Topic extends BaseEntity {
-    @PrimaryColumn({
-    })
-    key: string
-
-    @Column({
-        nullable: true
-    })
-    slug: string
-
-    @Column({
-        nullable: true,
-    })
-    description: string
-
-    @OneToMany(() => TopicTranslate, (topicTranslate: TopicTranslate) => topicTranslate.key,
-        {nullable: true, eager: false, cascade: true}
-    )
-    topicTranslates: TopicTranslate[]
-}
-
-# Create A Topic by Admin with KeySlug:
-- service:
- slugify(key: string) { //Key -> Slug
-    return slug(key, {lower: true}).toString(36)
-  }
-  async createByAdmin(createTopicDto: CreateTopicDto): Promise<Topic> {
-    const topic = this.topicRepository.create( createTopicDto );
-    topic.slug = this.slugify(createTopicDto.key);
-    try {
-      await this.topicRepository.save(topic);
-    } catch (err) {
-      if (err.code === '23505') {
-        throw new ConflictException(
-          'Duplicate Description already exists',
-        );
-      } 
-      else {
-        throw new InternalServerErrorException();
-      }
-    }
-    return topic;
-  }
-- controller:
-  @Post()
-  @UsePipes(ValidationPipe)
-  async create(@Body() createTopicDto: CreateTopicDto): Promise<Topic> {
-    return this.topicService.createByAdmin(createTopicDto);
-  }
-
-# Get All Topic + SearchFilter + Pagination with KeySlug:
-- service:
-  getAllPaginate(options: IPaginationOptions): Observable<Pagination<TopicInterface>> {
-    const queryBuilder = this.topicRepository.createQueryBuilder('topic');
-    // queryBuilder.orderBy('topic.createdAt', 'DESC'); //todo: New to Old
-    queryBuilder.orderBy('topic.key', 'ASC');
-    return from (paginate<TopicInterface>(queryBuilder, options));
-  }
-
-  searchFilterPaginate(options: IPaginationOptions, topic: TopicInterface): Observable<Pagination<TopicInterface>>{
-    return from(this.topicRepository.findAndCount({
-        skip: Number(options.page) * Number(options.limit) || 0, //!page * limit = offset
-        take: Number(options.limit) || 10,
-        order: {key: "ASC"},
-        // relations: ['author', 'taskToCategories'],
-        select: ['key', 'slug', 'description'], //add more from interface
-        where: [
-            { slug: Like(`%${topic.slug}%`)}
-        ]
-    })).pipe(
-        map(([topics, totalTopics]) => {
-            const topicsPageable: Pagination<TopicInterface> = {
-                items: topics,
-                links: {
-                    first: options.route + `?limit=${options.limit}`,
-                    previous: options.route + ``,
-                    next: options.route + `?limit=${options.limit}&page=${Number(options.page) + 1}`,
-                    last: options.route + `?limit=${options.limit}&page=${Math.ceil(totalTopics / Number(options.limit))}`
-                },
-                meta: {
-                    currentPage: Number(options.page),
-                    itemCount: topics.length,
-                    itemsPerPage: Number(options.limit),
-                    totalItems: totalTopics,
-                    totalPages: Math.ceil(totalTopics / Number(options.limit))
-                }
-            };              
-            return topicsPageable;
-        })
-      ) 
-  }
-- controller:
-  @Get()
-  index(
-    @Query('page') page: number = 1, //page * limit = offset
-    @Query('limit') limit: number = 10,
-    @Query('slug') slug: string
-  ): Observable<Pagination<TopicInterface>> {
-      limit = limit > 100 ? 100 : limit;
-      if (slug === null || slug === undefined) {
-        return this.topicService.getAllPaginate(
-          {
-            page: Number(page), 
-            limit: Number(limit), 
-            route: 'http://localhost:5000/admin/topics',  
-          },
-        );
-    } else if (slug) {
-        return this.topicService.searchFilterPaginate(
-            {
-              page: Number(page),
-              limit: Number(limit),
-              route: 'http://localhost:5000/admin/topics',
-            },
-            { slug }
-        );
-    }
-  }
-
-# Get All by Client with KeySlug:
-- service:
- async findAllByClient(): Promise<Topic[]> {
-    const query = this.topicRepository.createQueryBuilder('topic')
-    .orderBy("topic.key");
-    const allTopics =  await query.getMany();
-    return allTopics;
-  }
-
-# Get One by Admin with KeySlug:
--service:
-  async findOneByAdminKeySlug(slug: any): Promise<Topic> {
-      const topic = await this.topicRepository.findOne(slug);
-      if (!topic) {
-        throw new NotFoundException(`Topic not found !`);
-      } else {
-        return topic;
-      }
-  }
-- controller:
-  @Get(':slug')
-  async findOne(@Param('slug') slug): Promise<Topic> {
-    return await this.topicService.findOneByAdminKeySlug({slug});
-  }
-
-# Update A Topic by Admin with KeySlug:
-- Nếu update title, ko update description thì phải thêm @IsOptional() vào DTO hoặc custom decorator
-- dto:
-  @IsString()
-  @IsOptional()
-  description: string;
-
-  @IsArray()
-  @IsOptional()
-  // @IsValidArrayNumber() //custom decorator nếu ko dùng @IsOptional()
-  topicTranslate: number[];
-
-- service:
-  const topicToUpdate = await this.topicRepository.findOne({slug: slug});
-  if (!topicToUpdate) {
-    throw new NotFoundException(`Topic not found !`);
-  } else {
-    const { description, topicTranslate } = updateTopicDto;
-    // if (key) { //!Cant update key because is is Primary Key
-    //   topicToUpdate.key = key;
-    //   topicToUpdate.slug = this.slugify(updateTopicDto.key);
-    // }
-    if (description != undefined || description) { topicToUpdate.description = description }
-    return this.topicRepository.save(topicToUpdate)
-  }
-
-- controller:
-  @Patch(':slug')
-  async update(@Param() param, @Body() updateTopicDto: UpdateTopicDto) {
-    return this.topicService.updateByAdmin(param.slug, updateTopicDto);
-  }
-
-# Delete A Topic by Admin with KeySlug:
-- service:
-  async removeByAdmin(slug: string): Promise<DeleteResult> {
-    const topicToDelete = await this.topicRepository.findOne({slug: slug});
-    if (!topicToDelete) {
-      throw new NotFoundException(`Topic not found !`);
-    } else {
-      return await this.topicRepository.delete({ slug: slug});
-    }
-  }
-
-- controller:
-  @Delete(':slug')
-  remove(@Param() param ) {
-    return this.topicService.removeByAdmin(param.slug);
-  }
-
-# Delete Multiples Topics by Admin with KeySlug:
-- service:
-  async removeMulti(slugs: string[]){
-    const topics = await this.topicRepository.find({
-      slug: In(slugs)
-    })
-    console.log(slugs)
-    topics.filter(topic => !slugs.includes(topic.slug))
-    const { affected } = await this.topicRepository.delete({slug: In(slugs)})
-    if (affected === 0) {
-      throw new BadRequestException('Product Multi not found')
-    }
-  }
-
-- controller:
-  @Delete()
-  removeMulti(
-    // @Param('slugs', ParseArrayPipe) slugs: string[]
-    @Query('slugs', ParseArrayPipe) slugs: string[]
-    // @Body() deleteTopicMulti: DeleteTopicMultiDto
-  ){
-    // return this.topicService.removeMulti(deleteTopicMulti.slugs) //@Body
-    return this.topicService.removeMulti(slugs)
-  }
-
-
-###### CRUD Topic with Multiples Language: (i18n Library)
-$ npm install --save nestjs-i18n
-
-- i18n
-  + en main.js
-  + vi main.js
-
-- nest-cli.json
-  + {
-      "collection": "@nestjs/schematics",
-      "sourceRoot": "src",
-      "compilerOptions": {
-        "plugins": ["@nestjs/swagger"],
-        "assets": [
-          { "include": "i18n/**/*", "watchAssets": true }
-        ]
-      }
-    }
-
-- global.constants.ts
-  + export enum BooleanEnum {
-        TRUE = 1,
-        FALSE = -1,
-    }
-    export const KEY_LANG_HEADER = 'lang';
-    export enum LangEnum {
-      Vi = 'vi',
-      En = 'en',
-    }
-    
-- i18n.config.ts
-  const i18nConfigOptions: I18nOptions = {
-    fallbackLanguage: LangEnum.Vi, // Not work if change to vi
-    fallbacks: {
-      // 'en-CA': 'fr',
-      // vi: 'vi',
-      'en-*': 'en',
-      // 'fr-*': 'fr',
-      // pt: 'pt-BR',
-    },
-    loader: I18nJsonLoader,
-    loaderOptions: {},
-    // Path not work here
-    // parserOptions: {
-    //   path: '../../i18n/', //path.join(__dirname, '/i18n/'),
-    //   watch: true,
-    // },
-    resolvers: [
-      { use: QueryResolver, options: [KEY_LANG_HEADER] },
-      new HeaderResolver([KEY_LANG_HEADER]),
-      AcceptLanguageResolver,
-      // new CookieResolver(['lang', 'locale', 'l']),
-    ],
-  };
-
-- app.module
-+   I18nModule.forRoot({
-      ...i18nConfigOptions,
-      loaderOptions: {
-        path: path.join(__dirname, '/i18n/'),
-        watch: true,
-      },
-    }),
-
-- topic.entity:
-    @PrimaryColumn()
-    key: string
-
-    @Column({
-        nullable: true
-    })
-    slug: string
-
-    @Column({
-        nullable: true,
-    })
-    description: string
-
-    @Column({ enum: BooleanEnum, default: BooleanEnum.FALSE })
-    enabled: BooleanEnum;
-
-    @OneToMany(() => TopicTranslation, (topicTranslate: TopicTranslation) => topicTranslate.topic,
-    {
-        cascade: ['insert'],
-    },
-    )
-    translates: TopicTranslation[]   
-
-- topic-translation.entity:
-   @PrimaryGeneratedColumn({
-    })
-    id: number
-
-    @ColumnString({ unique: true })
-    name: string;
-  
-    @ColumnString({ default: LangEnum.Vi, enum: LangEnum })
-    lang: LangEnum;
-  
-    @Column({ name: 'topic_key'})
-    topicKey: string;
-  
-    @ManyToOne(() => Topic, (topic) => topic.translates, {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    })
-    @JoinColumn({ name: 'topic_key'})
-    topic: Topic;
-
-- create-topic.dto.ts (dành cho cả 2 entity):
-  @IsString()
-  @MinLength(5)
-  @MaxLength(50)
-  @IsNotEmpty()
-  key: string; //lấy slug theo key
-
-  @IsString()
-  @IsOptional()
-  description: string;
-
-  @IsValidText({ minLength: 6, maxLength: 20 })
-  name: string;
-
-  @ApiHideProperty()
-  @Default(LangEnum.Vi)
-  lang: LangEnum;
-
-  @IsValidEnumNumber({ enum: BooleanEnum, default: BooleanEnum.FALSE })
-  enabled: BooleanEnum;
-
-- update-topic.dto.ts:
-  @IsValidText({ minLength: 6, maxLength: 20 })
-  name: string;
-
-  @IsValidEnumString({ enum: LangEnum })
-  lang: LangEnum;
-
-- translate.service:
-  constructor(private readonly i18n: I18nService) {}
-
-  async t(key: DottedLanguageObjectStringPaths, options?: TranslateOptions) {
-    const data = await this.i18n.t(key, options);
-    return data;
-  }
-
-- translate.interface (import * as mainJson from '../../i18n/vi/main.json';)
-    /* eslint-disable prettier/prettier */
-    import * as mainJson from '../../i18n/vi/main.json';
-    import { ENTITY_LANG, MAIN_LANG } from '../constants/global.constant';
-    /**
-    * If you update file localize, it will not effect immidiately
-    * You need to shutdown vs code and restart it again, some cache issue here.
-    */
-    const langData = {
-      [MAIN_LANG]: { ...mainJson },
-    };
-
-    type PathsToStringProps<T> = T extends string
-      ? []
-      : {
-          [K in Extract<keyof T, string>]: [K, ...PathsToStringProps<T[K]>];
-        }[Extract<keyof T, string>];
-
-    type Join<T extends string[], D extends string> = T extends []
-      ? never
-      : T extends [infer F]
-      ? F
-      : T extends [infer F, ...infer R]
-      ? F extends string
-        ? `${F}${D}${Join<Extract<R, string[]>, D>}`
-        : never
-      : string;
-
-    export type DottedLanguageObjectStringPaths = Join<
-      PathsToStringProps<typeof langData>,
-      '.'
-    >;
-
-- tsconfig.json:
-  "resolveJsonModule": true,
-  "allowJs": true
-  + (Lỗi đẻ ra nhiều file js nếu thêm sai)
-  + (Lỗi i18n not found nếu không thêm )
-  + (Không lỗi khi có translate.interface (import * as mainJson))
-
-- topic.service:
-  + findOneTransWith
-
---- Đọc NESTJS_CleverTube_Topic_MultiLanguage.md
-
-
-
-
+- Đọc NESTJS_CRUD_Topic_MultiLanguage.md
+- Đọc NESTJS_CRUD_Level_MultiLanguage.md
 ##############################OVERVIEW###################################
 ###### Middleware:
 # 1. Settings:
@@ -1034,10 +530,14 @@ $ npm install --save nestjs-i18n
   }
 
 ##############################CRUD TypeORM PostgreSQL Search Pagination###################################
-###### Cần làm gấp:
-- Theo Tasks và Categories
-# 1. Database TypeOrm PostgreSQL:
-  $ npm install --save @nestjs/typeorm typeorm pg @nestjs/config
+# 1. Database TypeOrm PostgreSQL: 0.2.45
+$ npm install --save @nestjs/typeorm typeorm pg @nestjs/config
+
+Bản typeorm 0.2.45:
+$ npm run migration:generate 'init-product'
+
+Bản typeorm 0.3.5:
+$ npm run migration:generate ./migrations/init-product
 
 - ormconfig.js
   let dbConfig = {
@@ -1142,56 +642,10 @@ $ npm install --save nestjs-i18n
   providers: [TasksService],
 
 
-# 4. uninstall uuid:
-$ npm uninstall uuid
 
-# Task Enum Status (Optional):
-- taskStatus.enum.ts:
-  export enum TaskStatus {
-    OPEN = 'OPEN',
-    IN_PROGRESS = 'IN_PROGRESS',
-    DONE = 'DONE',
-  }
-
-
-# 5. Global ValidationPipe DTO:
+# 5. Global:
 - main.ts:
   app.setGlobalPrefix('api');
-
-  app.useGlobalPipes(
-    //!Nếu ko để Global ValidationPipe thì trong Controller phải có ValidationPipe mới dùng được DTO
-    //!Nếu để Global ValidationPipe thì bắt buộc phải tạo DTO class-validator @IsNotEmpty
-    new ValidationPipe({
-      whitelist: true,
-    }),
-  );
-
-# 6. CRUD (with TypeORM SQL) (Done):
-- Promise<void> to return nothing
-
-- Repository task.repository.ts:
-- Service tasks.service.ts:
-- Controller tasks.controller.ts:
-
-  CRUD
-  + Create Task
-  + Get All Task + Get All Task Search Filter
-  + Update Task's Status
-  + Update Task
-  + Delete Task
-
-- Not Done:
-  + Get All Tasks id không theo thứ tự (chỉnh trong entity), Chưa trả về khi Update + Delete là Đã thành công
-  + Get All Tasks Search Filter (gõ title "hianhem" ko tìm được "hi anh em") (Phải dùng Elastic Search nâng cao)
-
-### RequestWithUser: (For Auth, For Relation) (Optional)
-- requestWithUser.interface.ts:
-  import { UserEntity } from './user.entity';
-  import { Request } from 'express';
-
-  export interface RequestWithUser extends Request {
-    user: UserEntity;
-  }
 
 ###### Relation:
 # eager: true + eager: false (For OneToMany ManyToOne) (chỉ 1 phía được eager:true, related entities always to be included) 
